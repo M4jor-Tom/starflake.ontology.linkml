@@ -1,6 +1,7 @@
 # Invalid: "x" is not a spectral class.
 id: bad
 name: Bad pack
+starting_ship_class: scout
 galaxy:
   id: g
   name: G

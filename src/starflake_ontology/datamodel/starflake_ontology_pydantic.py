@@ -215,22 +215,22 @@ class Vector3D(ConfiguredBaseModel):
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/M4jor-Tom/starflake-ontology',
          'in_subset': ['core']})
 
-    x: float = Field(default=..., description="""X component.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Vector3D', 'Orientation']} })
-    y: float = Field(default=..., description="""Y component.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Vector3D', 'Orientation']} })
-    z: float = Field(default=..., description="""Z component.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Vector3D', 'Orientation']} })
+    x: float = Field(default=..., description="""X component.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Vector3D', 'Attitude']} })
+    y: float = Field(default=..., description="""Y component.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Vector3D', 'Attitude']} })
+    z: float = Field(default=..., description="""Z component.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Vector3D', 'Attitude']} })
 
 
-class Orientation(ConfiguredBaseModel):
+class Attitude(ConfiguredBaseModel):
     """
-    A rotation in 3D space, stored as a unit quaternion.
+    The rotation of a body in 3D space, stored as a unit quaternion. Named Attitude (the aerospace term) so it does not clash with the engine's Quaternion type or Godot's Orientation enum.
     """
     linkml_meta: ClassVar[LinkMLMeta] = LinkMLMeta({'from_schema': 'https://w3id.org/M4jor-Tom/starflake-ontology',
          'in_subset': ['core']})
 
-    x: float = Field(default=..., description="""X component.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Vector3D', 'Orientation']} })
-    y: float = Field(default=..., description="""Y component.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Vector3D', 'Orientation']} })
-    z: float = Field(default=..., description="""Z component.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Vector3D', 'Orientation']} })
-    w: float = Field(default=..., description="""W (scalar) component.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Orientation']} })
+    x: float = Field(default=..., description="""X component.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Vector3D', 'Attitude']} })
+    y: float = Field(default=..., description="""Y component.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Vector3D', 'Attitude']} })
+    z: float = Field(default=..., description="""Z component.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Vector3D', 'Attitude']} })
+    w: float = Field(default=..., description="""W (scalar) component.""", json_schema_extra = { "linkml_meta": {'domain_of': ['Attitude']} })
 
 
 class ContentPack(NamedThing):
@@ -245,6 +245,7 @@ class ContentPack(NamedThing):
     ship_classes: Optional[list[ShipClass]] = Field(default=None, description="""Hull designs available to player and enemy ships.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ContentPack']} })
     enemy_types: Optional[list[EnemyType]] = Field(default=None, description="""Hostile archetypes that can spawn in star systems.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ContentPack']} })
     asteroid_types: Optional[list[AsteroidType]] = Field(default=None, description="""Asteroid kinds that can spawn in star systems.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ContentPack']} })
+    starting_ship_class: str = Field(default=..., description="""The hull every new player ship is built from.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ContentPack']} })
     galaxy: Galaxy = Field(default=..., description="""The map played with this content.""", json_schema_extra = { "linkml_meta": {'domain_of': ['ContentPack']} })
     id: str = Field(default=..., description="""A unique identifier.""", json_schema_extra = { "linkml_meta": {'domain_of': ['NamedThing', 'GameSession', 'SpaceEntity'],
          'slot_uri': 'schema:identifier'} })
@@ -464,7 +465,7 @@ class SpaceEntity(ConfiguredBaseModel):
          'slot_uri': 'schema:identifier'} })
     position: Vector3D = Field(default=..., description="""Position relative to the star of the current system.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SpaceEntity']} })
     velocity: Optional[Vector3D] = Field(default=None, description="""Linear velocity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SpaceEntity']} })
-    orientation: Optional[Orientation] = Field(default=None, description="""Facing of the entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SpaceEntity']} })
+    orientation: Optional[Attitude] = Field(default=None, description="""Facing of the entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SpaceEntity']} })
 
 
 class Ship(SpaceEntity):
@@ -480,7 +481,7 @@ class Ship(SpaceEntity):
          'slot_uri': 'schema:identifier'} })
     position: Vector3D = Field(default=..., description="""Position relative to the star of the current system.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SpaceEntity']} })
     velocity: Optional[Vector3D] = Field(default=None, description="""Linear velocity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SpaceEntity']} })
-    orientation: Optional[Orientation] = Field(default=None, description="""Facing of the entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SpaceEntity']} })
+    orientation: Optional[Attitude] = Field(default=None, description="""Facing of the entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SpaceEntity']} })
 
 
 class PlayerShip(Ship):
@@ -499,7 +500,7 @@ class PlayerShip(Ship):
          'slot_uri': 'schema:identifier'} })
     position: Vector3D = Field(default=..., description="""Position relative to the star of the current system.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SpaceEntity']} })
     velocity: Optional[Vector3D] = Field(default=None, description="""Linear velocity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SpaceEntity']} })
-    orientation: Optional[Orientation] = Field(default=None, description="""Facing of the entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SpaceEntity']} })
+    orientation: Optional[Attitude] = Field(default=None, description="""Facing of the entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SpaceEntity']} })
 
 
 class EnemyShip(Ship):
@@ -515,7 +516,7 @@ class EnemyShip(Ship):
          'slot_uri': 'schema:identifier'} })
     position: Vector3D = Field(default=..., description="""Position relative to the star of the current system.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SpaceEntity']} })
     velocity: Optional[Vector3D] = Field(default=None, description="""Linear velocity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SpaceEntity']} })
-    orientation: Optional[Orientation] = Field(default=None, description="""Facing of the entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SpaceEntity']} })
+    orientation: Optional[Attitude] = Field(default=None, description="""Facing of the entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SpaceEntity']} })
 
 
 class Asteroid(SpaceEntity):
@@ -531,7 +532,7 @@ class Asteroid(SpaceEntity):
          'slot_uri': 'schema:identifier'} })
     position: Vector3D = Field(default=..., description="""Position relative to the star of the current system.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SpaceEntity']} })
     velocity: Optional[Vector3D] = Field(default=None, description="""Linear velocity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SpaceEntity']} })
-    orientation: Optional[Orientation] = Field(default=None, description="""Facing of the entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SpaceEntity']} })
+    orientation: Optional[Attitude] = Field(default=None, description="""Facing of the entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SpaceEntity']} })
 
 
 class LootDrop(SpaceEntity):
@@ -546,14 +547,14 @@ class LootDrop(SpaceEntity):
          'slot_uri': 'schema:identifier'} })
     position: Vector3D = Field(default=..., description="""Position relative to the star of the current system.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SpaceEntity']} })
     velocity: Optional[Vector3D] = Field(default=None, description="""Linear velocity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SpaceEntity']} })
-    orientation: Optional[Orientation] = Field(default=None, description="""Facing of the entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SpaceEntity']} })
+    orientation: Optional[Attitude] = Field(default=None, description="""Facing of the entity.""", json_schema_extra = { "linkml_meta": {'domain_of': ['SpaceEntity']} })
 
 
 # Model rebuild
 # see https://pydantic-docs.helpmanual.io/usage/models/#rebuilding-a-model
 NamedThing.model_rebuild()
 Vector3D.model_rebuild()
-Orientation.model_rebuild()
+Attitude.model_rebuild()
 ContentPack.model_rebuild()
 WeaponType.model_rebuild()
 ShipClass.model_rebuild()

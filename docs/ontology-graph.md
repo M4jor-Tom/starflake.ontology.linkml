@@ -23,7 +23,7 @@ class Vector3D {
   +float y [1]
   +float z [1]
 }
-class Orientation {
+class Attitude {
   +float x [1]
   +float y [1]
   +float z [1]
@@ -91,6 +91,7 @@ ContentPack *-- "*" WeaponType : weapon_types
 ContentPack *-- "*" ShipClass : ship_classes
 ContentPack *-- "*" EnemyType : enemy_types
 ContentPack *-- "*" AsteroidType : asteroid_types
+ContentPack --> "1" ShipClass : starting_ship_class
 ContentPack *-- "1" Galaxy : galaxy
 NamedThing <|-- WeaponType
 NamedThing <|-- ShipClass
@@ -165,7 +166,7 @@ StarSystemState *-- "*" EnemyShip : enemy_ships
 StarSystemState *-- "*" LootDrop : loot_drops
 SpaceEntity *-- "1" Vector3D : position
 SpaceEntity *-- "0..1" Vector3D : velocity
-SpaceEntity *-- "0..1" Orientation : orientation
+SpaceEntity *-- "0..1" Attitude : orientation
 SpaceEntity <|-- Ship
 Ship <|-- PlayerShip
 PlayerShip --> "1" ShipClass : ship_class

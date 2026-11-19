@@ -444,10 +444,10 @@ slots:
     description: X component.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
     slot_uri: starflake:x
-    owner: Orientation
+    owner: Attitude
     domain_of:
     - Vector3D
-    - Orientation
+    - Attitude
     range: float
     required: true
   y:
@@ -456,10 +456,10 @@ slots:
     description: Y component.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
     slot_uri: starflake:y
-    owner: Orientation
+    owner: Attitude
     domain_of:
     - Vector3D
-    - Orientation
+    - Attitude
     range: float
     required: true
   z:
@@ -468,10 +468,10 @@ slots:
     description: Z component.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
     slot_uri: starflake:z
-    owner: Orientation
+    owner: Attitude
     domain_of:
     - Vector3D
-    - Orientation
+    - Attitude
     range: float
     required: true
   w:
@@ -480,9 +480,9 @@ slots:
     description: W (scalar) component.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
     slot_uri: starflake:w
-    owner: Orientation
+    owner: Attitude
     domain_of:
-    - Orientation
+    - Attitude
     range: float
     required: true
   radius:
@@ -600,6 +600,18 @@ slots:
     multivalued: true
     inlined: true
     inlined_as_list: true
+  contentPack__starting_ship_class:
+    name: contentPack__starting_ship_class
+    description: The hull every new player ship is built from.
+    from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
+    slot_uri: starflake:starting_ship_class
+    alias: starting_ship_class
+    owner: ContentPack
+    domain_of:
+    - ContentPack
+    range: ShipClass
+    required: true
+    inlined: false
   contentPack__galaxy:
     name: contentPack__galaxy
     description: The map played with this content.
@@ -1046,7 +1058,7 @@ slots:
     owner: SpaceEntity
     domain_of:
     - SpaceEntity
-    range: Orientation
+    range: Attitude
     inlined: true
     inlined_as_list: true
   ship__hull:
@@ -1178,10 +1190,12 @@ classes:
     - y
     - z
     class_uri: starflake:Vector3D
-  Orientation:
-    name: Orientation
-    definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/Orientation
-    description: A rotation in 3D space, stored as a unit quaternion.
+  Attitude:
+    name: Attitude
+    definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/Attitude
+    description: The rotation of a body in 3D space, stored as a unit quaternion.
+      Named Attitude (the aerospace term) so it does not clash with the engine's Quaternion
+      type or Godot's Orientation enum.
     in_subset:
     - core
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
@@ -1190,7 +1204,7 @@ classes:
     - y
     - z
     - w
-    class_uri: starflake:Orientation
+    class_uri: starflake:Attitude
   ContentPack:
     name: ContentPack
     definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/ContentPack
@@ -1208,6 +1222,7 @@ classes:
     - contentPack__ship_classes
     - contentPack__enemy_types
     - contentPack__asteroid_types
+    - contentPack__starting_ship_class
     - contentPack__galaxy
     attributes:
       weapon_types:
@@ -1234,6 +1249,12 @@ classes:
         range: AsteroidType
         multivalued: true
         inlined_as_list: true
+      starting_ship_class:
+        name: starting_ship_class
+        description: The hull every new player ship is built from.
+        range: ShipClass
+        required: true
+        inlined: false
       galaxy:
         name: galaxy
         description: The map played with this content.
@@ -1694,7 +1715,7 @@ classes:
       orientation:
         name: orientation
         description: Facing of the entity.
-        range: Orientation
+        range: Attitude
         inlined: true
     class_uri: starflake:SpaceEntity
   Ship:
@@ -1817,6 +1838,6 @@ classes:
     class_uri: starflake:LootDrop
 metamodel_version: 1.12.0
 source_file: starflake_ontology.yaml
-source_file_date: '2026-11-19T15:33:01'
-source_file_size: 16073
+source_file_date: '2026-11-19T16:38:26'
+source_file_size: 16385
 

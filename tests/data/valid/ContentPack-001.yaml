@@ -31,6 +31,7 @@ enemy_types:
     ship_class: raider
     detection_range: 800
     fuel_drop: 15
+starting_ship_class: scout
 asteroid_types:
   - id: ice_rock
     name: Ice rock

@@ -241,16 +241,17 @@ class Vector3D(YAMLRoot):
 
 
 @dataclass(repr=False)
-class Orientation(YAMLRoot):
+class Attitude(YAMLRoot):
     """
-    A rotation in 3D space, stored as a unit quaternion.
+    The rotation of a body in 3D space, stored as a unit quaternion. Named Attitude (the aerospace term) so it does
+    not clash with the engine's Quaternion type or Godot's Orientation enum.
     """
     _inherited_slots: ClassVar[list[str]] = []
 
-    class_class_uri: ClassVar[URIRef] = STARFLAKE["Orientation"]
-    class_class_curie: ClassVar[str] = "starflake:Orientation"
-    class_name: ClassVar[str] = "Orientation"
-    class_model_uri: ClassVar[URIRef] = STARFLAKE.Orientation
+    class_class_uri: ClassVar[URIRef] = STARFLAKE["Attitude"]
+    class_class_curie: ClassVar[str] = "starflake:Attitude"
+    class_name: ClassVar[str] = "Attitude"
+    class_model_uri: ClassVar[URIRef] = STARFLAKE.Attitude
 
     x: float = None
     y: float = None
@@ -295,6 +296,7 @@ class ContentPack(NamedThing):
 
     id: Union[str, ContentPackId] = None
     name: str = None
+    starting_ship_class: Union[str, ShipClassId] = None
     galaxy: Union[dict, "Galaxy"] = None
     weapon_types: Optional[Union[dict[Union[str, WeaponTypeId], Union[dict, "WeaponType"]], list[Union[dict, "WeaponType"]]]] = empty_dict()
     ship_classes: Optional[Union[dict[Union[str, ShipClassId], Union[dict, "ShipClass"]], list[Union[dict, "ShipClass"]]]] = empty_dict()
@@ -306,6 +308,11 @@ class ContentPack(NamedThing):
             self.MissingRequiredField("id")
         if not isinstance(self.id, ContentPackId):
             self.id = ContentPackId(self.id)
+
+        if self._is_empty(self.starting_ship_class):
+            self.MissingRequiredField("starting_ship_class")
+        if not isinstance(self.starting_ship_class, ShipClassId):
+            self.starting_ship_class = ShipClassId(self.starting_ship_class)
 
         if self._is_empty(self.galaxy):
             self.MissingRequiredField("galaxy")
@@ -821,7 +828,7 @@ class SpaceEntity(YAMLRoot):
     id: Union[str, SpaceEntityId] = None
     position: Union[dict, Vector3D] = None
     velocity: Optional[Union[dict, Vector3D]] = None
-    orientation: Optional[Union[dict, Orientation]] = None
+    orientation: Optional[Union[dict, Attitude]] = None
 
     def __post_init__(self, *_: str, **kwargs: Any):
         if self._is_empty(self.id):
@@ -837,8 +844,8 @@ class SpaceEntity(YAMLRoot):
         if self.velocity is not None and not isinstance(self.velocity, Vector3D):
             self.velocity = Vector3D(**as_dict(self.velocity))
 
-        if self.orientation is not None and not isinstance(self.orientation, Orientation):
-            self.orientation = Orientation(**as_dict(self.orientation))
+        if self.orientation is not None and not isinstance(self.orientation, Attitude):
+            self.orientation = Attitude(**as_dict(self.orientation))
 
         super().__post_init__(**kwargs)
 
@@ -1124,6 +1131,9 @@ slots.contentPack__enemy_types = Slot(uri=STARFLAKE.enemy_types, name="contentPa
 slots.contentPack__asteroid_types = Slot(uri=STARFLAKE.asteroid_types, name="contentPack__asteroid_types", curie=STARFLAKE.curie('asteroid_types'),
                    model_uri=STARFLAKE.contentPack__asteroid_types, domain=None, range=Optional[Union[dict[Union[str, AsteroidTypeId], Union[dict, AsteroidType]], list[Union[dict, AsteroidType]]]])
 
+slots.contentPack__starting_ship_class = Slot(uri=STARFLAKE.starting_ship_class, name="contentPack__starting_ship_class", curie=STARFLAKE.curie('starting_ship_class'),
+                   model_uri=STARFLAKE.contentPack__starting_ship_class, domain=None, range=Union[str, ShipClassId])
+
 slots.contentPack__galaxy = Slot(uri=STARFLAKE.galaxy, name="contentPack__galaxy", curie=STARFLAKE.curie('galaxy'),
                    model_uri=STARFLAKE.contentPack__galaxy, domain=None, range=Union[dict, Galaxy])
 
@@ -1233,7 +1243,7 @@ slots.spaceEntity__velocity = Slot(uri=STARFLAKE.velocity, name="spaceEntity__ve
                    model_uri=STARFLAKE.spaceEntity__velocity, domain=None, range=Optional[Union[dict, Vector3D]])
 
 slots.spaceEntity__orientation = Slot(uri=STARFLAKE.orientation, name="spaceEntity__orientation", curie=STARFLAKE.curie('orientation'),
-                   model_uri=STARFLAKE.spaceEntity__orientation, domain=None, range=Optional[Union[dict, Orientation]])
+                   model_uri=STARFLAKE.spaceEntity__orientation, domain=None, range=Optional[Union[dict, Attitude]])
 
 slots.ship__hull = Slot(uri=STARFLAKE.hull, name="ship__hull", curie=STARFLAKE.curie('hull'),
                    model_uri=STARFLAKE.ship__hull, domain=None, range=Union[float, Amount])

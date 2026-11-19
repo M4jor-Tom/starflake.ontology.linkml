@@ -84,9 +84,12 @@ classes:
       Named Vector3D so it does not shadow the engine's own Vector3.
     slots: [x, y, z]
 
-  Orientation:
+  Attitude:
     in_subset: [core]
-    description: A rotation in 3D space, stored as a unit quaternion.
+    description: >-
+      The rotation of a body in 3D space, stored as a unit quaternion.
+      Named Attitude (the aerospace term) so it does not clash with the
+      engine's Quaternion type or Godot's Orientation enum.
     slots: [x, y, z, w]
 
   # ------------------------------------------------------------ content
@@ -119,6 +122,11 @@ classes:
         range: AsteroidType
         multivalued: true
         inlined_as_list: true
+      starting_ship_class:
+        description: The hull every new player ship is built from.
+        range: ShipClass
+        required: true
+        inlined: false
       galaxy:
         description: The map played with this content.
         range: Galaxy
@@ -424,7 +432,7 @@ classes:
         inlined: true
       orientation:
         description: Facing of the entity.
-        range: Orientation
+        range: Attitude
         inlined: true
 
   Ship:

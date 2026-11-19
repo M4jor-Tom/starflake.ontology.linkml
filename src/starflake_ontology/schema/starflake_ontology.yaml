@@ -1,0 +1,582 @@
+---
+id: https://w3id.org/M4jor-Tom/starflake-ontology
+name: starflake-ontology
+title: Starflake ontology
+description: |-
+  Domain ontology for Starflake, an open-world 3D space explorer.
+
+  The pilot flies a ship through a galaxy of star systems, shoots enemies and
+  asteroids, loots the fuel they drop, and jumps to a neighbouring system once
+  the tank holds enough fuel.
+
+  The schema has two layers:
+
+  * **Content** (`ContentPack`): static, designer-authored definitions such as
+    ship classes, weapons, enemy and asteroid types, and the galaxy map.
+  * **State** (`GameSession`): the persisted, replicable state of one play
+    session, which references content by identifier.
+
+  Units: distances in metres, time in seconds, angles in radians.
+license: Apache-2.0
+see_also:
+  - https://M4jor-Tom.github.io/starflake-ontology
+
+prefixes:
+  starflake: https://w3id.org/M4jor-Tom/starflake-ontology/
+  linkml: https://w3id.org/linkml/
+  schema: http://schema.org/
+default_prefix: starflake
+default_range: string
+
+imports:
+  - linkml:types
+
+subsets:
+  core:
+    description: Building blocks shared by content and state.
+  content:
+    description: Static, designer-authored definitions bundled in a ContentPack.
+  state:
+    description: Persisted and replicated session state, rooted at GameSession.
+
+types:
+  Amount:
+    typeof: float
+    uri: xsd:float
+    base: float
+    minimum_value: 0
+    description: A non-negative quantity such as hull points, damage or fuel.
+  Distance:
+    typeof: float
+    uri: xsd:float
+    base: float
+    minimum_value: 0
+    unit:
+      ucum_code: m
+    description: A non-negative length in metres.
+  Speed:
+    typeof: float
+    uri: xsd:float
+    base: float
+    minimum_value: 0
+    unit:
+      ucum_code: m/s
+    description: A non-negative speed in metres per second.
+
+classes:
+
+  # ------------------------------------------------------------ core
+
+  NamedThing:
+    in_subset: [core]
+    abstract: true
+    description: Anything identifiable and named, whether content or state.
+    slots:
+      - id
+      - name
+      - description
+    class_uri: schema:Thing
+
+  Vector3D:
+    in_subset: [core]
+    description: >-
+      A 3D vector in metres (position) or metres per second (velocity).
+      Named Vector3D so it does not shadow the engine's own Vector3.
+    slots: [x, y, z]
+
+  Orientation:
+    in_subset: [core]
+    description: A rotation in 3D space, stored as a unit quaternion.
+    slots: [x, y, z, w]
+
+  # ------------------------------------------------------------ content
+
+  ContentPack:
+    in_subset: [content]
+    tree_root: true
+    is_a: NamedThing
+    description: >-
+      A versioned bundle of designer-authored content. Everything a session
+      references by identifier is defined here.
+    attributes:
+      weapon_types:
+        description: Weapons available to ship classes.
+        range: WeaponType
+        multivalued: true
+        inlined_as_list: true
+      ship_classes:
+        description: Hull designs available to player and enemy ships.
+        range: ShipClass
+        multivalued: true
+        inlined_as_list: true
+      enemy_types:
+        description: Hostile archetypes that can spawn in star systems.
+        range: EnemyType
+        multivalued: true
+        inlined_as_list: true
+      asteroid_types:
+        description: Asteroid kinds that can spawn in star systems.
+        range: AsteroidType
+        multivalued: true
+        inlined_as_list: true
+      galaxy:
+        description: The map played with this content.
+        range: Galaxy
+        required: true
+        inlined: true
+
+  WeaponType:
+    in_subset: [content]
+    is_a: NamedThing
+    description: A ship-mounted weapon that fires projectiles.
+    attributes:
+      damage:
+        description: Hull or integrity points removed per hit.
+        range: Amount
+        required: true
+      fire_rate:
+        description: Shots per second.
+        range: Amount
+        required: true
+        unit:
+          ucum_code: /s
+      projectile_speed:
+        description: Speed of a fired projectile.
+        range: Speed
+        required: true
+      max_range:
+        description: Distance after which a projectile despawns.
+        range: Distance
+        required: true
+
+  ShipClass:
+    in_subset: [content]
+    is_a: NamedThing
+    description: A hull design that player and enemy ships are built from.
+    attributes:
+      max_hull:
+        description: Hull points of an undamaged ship.
+        range: Amount
+        required: true
+      max_speed:
+        description: Top linear speed.
+        range: Speed
+        required: true
+      acceleration:
+        description: Linear acceleration under full thrust.
+        range: Amount
+        required: true
+        unit:
+          ucum_code: m/s2
+      turn_rate:
+        description: Maximum angular speed.
+        range: Amount
+        required: true
+        unit:
+          ucum_code: rad/s
+      fuel_capacity:
+        description: Maximum fuel the tank holds. Zero for ships that never jump.
+        range: Amount
+        required: true
+      weapons:
+        description: Weapons mounted on every ship of this class.
+        range: WeaponType
+        multivalued: true
+        inlined: false
+
+  EnemyType:
+    in_subset: [content]
+    is_a: NamedThing
+    description: >-
+      A hostile AI pilot archetype: which hull it flies, when it engages, and
+      what it drops when destroyed.
+    slots:
+      - ship_class
+      - fuel_drop
+    attributes:
+      detection_range:
+        description: Distance at which the enemy notices and chases a player ship.
+        range: Distance
+        required: true
+
+  AsteroidType:
+    in_subset: [content]
+    is_a: NamedThing
+    description: >-
+      A kind of asteroid. Shooting it until its integrity reaches zero breaks
+      it and leaves a fuel loot drop.
+    slots:
+      - radius
+      - fuel_drop
+    slot_usage:
+      radius:
+        description: Collision radius of the asteroid.
+    attributes:
+      max_integrity:
+        description: Damage needed to break the asteroid.
+        range: Amount
+        required: true
+
+  Galaxy:
+    in_subset: [content]
+    is_a: NamedThing
+    description: The map of star systems connected by jump routes.
+    attributes:
+      star_systems:
+        description: Every star system of the galaxy.
+        range: StarSystem
+        multivalued: true
+        required: true
+        inlined_as_list: true
+      starting_system:
+        description: Where new player ships spawn.
+        range: StarSystem
+        required: true
+        inlined: false
+
+  StarSystem:
+    in_subset: [content]
+    is_a: NamedThing
+    description: >-
+      One playable area around a star. A player ship can jump to any system in
+      jump_targets once it carries at least jump_fuel_cost fuel.
+    attributes:
+      star_class:
+        description: Spectral class of the star, driving its look.
+        range: SpectralClass
+        required: true
+      bounds_radius:
+        description: Radius of the playable sphere centred on the star.
+        range: Distance
+        required: true
+      jump_fuel_cost:
+        description: Fuel consumed by a jump out of this system.
+        range: Amount
+        required: true
+      jump_targets:
+        description: Systems reachable by a single jump from this one.
+        range: StarSystem
+        multivalued: true
+        inlined: false
+      asteroid_fields:
+        description: Asteroid spawn regions in this system.
+        range: AsteroidField
+        multivalued: true
+        inlined_as_list: true
+      enemy_groups:
+        description: Enemy spawn regions in this system.
+        range: EnemyGroup
+        multivalued: true
+        inlined_as_list: true
+
+  SpawnRegion:
+    in_subset: [content]
+    abstract: true
+    description: >-
+      A sphere inside a star system where a number of entities spawn when the
+      system state is first created.
+    slots:
+      - radius
+    slot_usage:
+      radius:
+        description: Radius of the spawn sphere.
+    attributes:
+      center:
+        description: Centre of the region, relative to the star.
+        range: Vector3D
+        required: true
+        inlined: true
+      spawn_count:
+        description: Number of entities spawned in the region.
+        range: integer
+        required: true
+        minimum_value: 1
+
+  AsteroidField:
+    in_subset: [content]
+    is_a: SpawnRegion
+    description: A region filled with asteroids of one type.
+    slots:
+      - asteroid_type
+
+  EnemyGroup:
+    in_subset: [content]
+    is_a: SpawnRegion
+    description: A region where enemies of one type spawn.
+    slots:
+      - enemy_type
+
+  # ------------------------------------------------------------ state
+
+  GameSession:
+    in_subset: [state]
+    description: >-
+      The persisted state of one play session: a save file in solo, the
+      authoritative world on a host or dedicated server in multiplayer.
+    slots:
+      - id
+    attributes:
+      content_pack:
+        description: The content this session was created with.
+        range: ContentPack
+        required: true
+        inlined: false
+      hosting_mode:
+        description: Who runs the authoritative simulation.
+        range: HostingMode
+        required: true
+      host:
+        description: The player hosting the session. Absent on a dedicated server.
+        range: Player
+        inlined: false
+      max_players:
+        description: Maximum number of players allowed at once.
+        range: integer
+        required: true
+        minimum_value: 1
+      players:
+        description: Everyone who has joined the session.
+        range: Player
+        multivalued: true
+        required: true
+        inlined_as_list: true
+      player_ships:
+        description: The ship of each player.
+        range: PlayerShip
+        multivalued: true
+        inlined_as_list: true
+      system_states:
+        description: >-
+          State of the systems visited so far. A system without state has not
+          been generated yet.
+        range: StarSystemState
+        multivalued: true
+        inlined_as_list: true
+    rules:
+      - description: Solo sessions hold exactly one player.
+        preconditions:
+          slot_conditions:
+            hosting_mode:
+              equals_string: solo
+        postconditions:
+          slot_conditions:
+            max_players:
+              equals_number: 1
+      - description: No player hosts a session that runs on a dedicated server.
+        preconditions:
+          slot_conditions:
+            hosting_mode:
+              equals_string: dedicated_server
+        postconditions:
+          slot_conditions:
+            host:
+              value_presence: ABSENT
+
+  Player:
+    in_subset: [state]
+    is_a: NamedThing
+    description: A person taking part in a session. Its name is shown to other players.
+
+  StarSystemState:
+    in_subset: [state]
+    description: >-
+      The world state of one star system within a session: what remains of
+      its asteroids and enemies, and the loot floating there.
+    attributes:
+      star_system:
+        description: The star system this state belongs to.
+        range: StarSystem
+        required: true
+        inlined: false
+      asteroids:
+        description: Asteroids not broken yet.
+        range: Asteroid
+        multivalued: true
+        inlined_as_list: true
+      enemy_ships:
+        description: Enemy ships not destroyed yet.
+        range: EnemyShip
+        multivalued: true
+        inlined_as_list: true
+      loot_drops:
+        description: Fuel not collected yet.
+        range: LootDrop
+        multivalued: true
+        inlined_as_list: true
+
+  SpaceEntity:
+    in_subset: [state]
+    abstract: true
+    description: >-
+      Anything with a physical presence in a star system. The identifier
+      doubles as the network id in multiplayer.
+    slots:
+      - id
+    attributes:
+      position:
+        description: Position relative to the star of the current system.
+        range: Vector3D
+        required: true
+        inlined: true
+      velocity:
+        description: Linear velocity.
+        range: Vector3D
+        inlined: true
+      orientation:
+        description: Facing of the entity.
+        range: Orientation
+        inlined: true
+
+  Ship:
+    in_subset: [state]
+    abstract: true
+    is_a: SpaceEntity
+    description: A flying, armed entity that can be destroyed.
+    attributes:
+      hull:
+        description: Remaining hull points. The ship is destroyed at zero.
+        range: Amount
+        required: true
+
+  PlayerShip:
+    in_subset: [state]
+    is_a: Ship
+    description: A ship flown by a player.
+    slots:
+      - ship_class
+    attributes:
+      pilot:
+        description: The player flying the ship.
+        range: Player
+        required: true
+        inlined: false
+      current_system:
+        description: The star system the ship is in.
+        range: StarSystem
+        required: true
+        inlined: false
+      fuel:
+        description: Fuel in the tank, at most the ship class fuel_capacity.
+        range: Amount
+        required: true
+
+  EnemyShip:
+    in_subset: [state]
+    is_a: Ship
+    description: A hostile AI ship. Its hull design comes from its enemy type.
+    slots:
+      - enemy_type
+
+  Asteroid:
+    in_subset: [state]
+    is_a: SpaceEntity
+    description: An asteroid that breaks into a fuel loot drop when shot enough.
+    slots:
+      - asteroid_type
+    attributes:
+      integrity:
+        description: Remaining integrity. The asteroid breaks at zero.
+        range: Amount
+        required: true
+
+  LootDrop:
+    in_subset: [state]
+    is_a: SpaceEntity
+    description: Fuel floating in space, collected by flying a player ship into it.
+    attributes:
+      fuel_amount:
+        description: Fuel collected by picking up this drop.
+        range: Amount
+        required: true
+
+slots:
+  id:
+    identifier: true
+    slot_uri: schema:identifier
+    range: string
+    description: A unique identifier.
+  name:
+    slot_uri: schema:name
+    required: true
+    description: A human-readable name.
+  description:
+    slot_uri: schema:description
+    description: A human-readable description.
+  x:
+    description: X component.
+    range: float
+    required: true
+  y:
+    description: Y component.
+    range: float
+    required: true
+  z:
+    description: Z component.
+    range: float
+    required: true
+  w:
+    description: W (scalar) component.
+    range: float
+    required: true
+  radius:
+    description: Radius of a sphere.
+    range: Distance
+    required: true
+  fuel_drop:
+    description: Fuel in the loot drop left when this is destroyed.
+    range: Amount
+    required: true
+  ship_class:
+    description: The hull design.
+    range: ShipClass
+    required: true
+    inlined: false
+  asteroid_type:
+    description: The kind of asteroid.
+    range: AsteroidType
+    required: true
+    inlined: false
+  enemy_type:
+    description: The enemy archetype.
+    range: EnemyType
+    required: true
+    inlined: false
+
+enums:
+
+  SpectralClass:
+    in_subset: [content]
+    description: Morgan-Keenan spectral class of a star, hottest to coolest.
+    permissible_values:
+      o:
+        title: O
+        description: Blue, above 30,000 K.
+      b:
+        title: B
+        description: Blue-white, 10,000 to 30,000 K.
+      a:
+        title: A
+        description: White, 7,500 to 10,000 K.
+      f:
+        title: F
+        description: Yellow-white, 6,000 to 7,500 K.
+      g:
+        title: G
+        description: Yellow, 5,200 to 6,000 K, like the Sun.
+      k:
+        title: K
+        description: Orange, 3,700 to 5,200 K.
+      m:
+        title: M
+        description: Red, below 3,700 K.
+
+  HostingMode:
+    in_subset: [state]
+    description: Who runs the authoritative simulation of a session.
+    permissible_values:
+      solo:
+        description: Single player, simulated locally, no network.
+      player_hosted:
+        description: A player's game acts as server for the players they invite.
+      dedicated_server:
+        description: A server not run by any player hosts the session.

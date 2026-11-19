@@ -1,0 +1,13 @@
+# Invalid: "x" is not a spectral class.
+id: bad
+name: Bad pack
+galaxy:
+  id: g
+  name: G
+  starting_system: s
+  star_systems:
+    - id: s
+      name: S
+      star_class: x
+      bounds_radius: 1
+      jump_fuel_cost: 1

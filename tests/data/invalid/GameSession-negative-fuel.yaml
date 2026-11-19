@@ -1,0 +1,16 @@
+# Invalid: fuel cannot be negative.
+id: session-bad
+content_pack: core
+hosting_mode: solo
+max_players: 1
+players:
+  - id: player-1
+    name: Theta
+player_ships:
+  - id: ship-1
+    pilot: player-1
+    ship_class: scout
+    current_system: sol
+    hull: 100
+    fuel: -5
+    position: {x: 0, y: 0, z: 0}

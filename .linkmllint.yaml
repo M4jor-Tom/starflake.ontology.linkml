@@ -1,0 +1,7 @@
+extends: recommended
+rules:
+  standard_naming:
+    # Allow one-letter slots such as vector components x, y, z, w.
+    slot_pattern: "[a-z][_a-z0-9]*"
+    # Morgan-Keenan spectral classes are single letters by convention.
+    exclude: [o, b, a, f, g, k, m]

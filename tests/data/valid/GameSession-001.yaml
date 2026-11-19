@@ -1,0 +1,35 @@
+# A solo save after the first fight in Sol.
+id: session-42
+content_pack: core
+hosting_mode: solo
+max_players: 1
+host: player-1
+players:
+  - id: player-1
+    name: Theta
+player_ships:
+  - id: ship-1
+    pilot: player-1
+    ship_class: scout
+    current_system: sol
+    hull: 85
+    fuel: 25
+    position: {x: 1900, y: 10, z: 480}
+    velocity: {x: 0, y: 0, z: 0}
+    orientation: {x: 0, y: 0, z: 0, w: 1}
+system_states:
+  - star_system: sol
+    asteroids:
+      - id: asteroid-1
+        asteroid_type: ice_rock
+        integrity: 20
+        position: {x: 2100, y: 30, z: 450}
+    enemy_ships:
+      - id: enemy-1
+        enemy_type: pirate
+        hull: 40
+        position: {x: -2950, y: 180, z: 20}
+    loot_drops:
+      - id: loot-1
+        fuel_amount: 10
+        position: {x: 1950, y: 15, z: 470}

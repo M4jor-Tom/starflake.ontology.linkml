@@ -1,0 +1,8 @@
+# Invalid: a solo session must allow exactly one player.
+id: session-bad
+content_pack: core
+hosting_mode: solo
+max_players: 4
+players:
+  - id: player-1
+    name: Theta

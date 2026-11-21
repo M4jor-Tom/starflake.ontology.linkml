@@ -33,12 +33,10 @@ class Attitude {
 
 ## Content
 
-Static, designer-authored definitions bundled in a ContentPack.
+What exists in a galaxy, rooted at Galaxy.
 
 ```mermaid
 classDiagram
-class ContentPack {
-}
 class WeaponType {
   +Amount damage [1]
   +Amount fire_rate [1]
@@ -51,14 +49,18 @@ class ShipClass {
   +Amount acceleration [1]
   +Amount turn_rate [1]
   +Amount fuel_capacity [1]
+  +Distance scoop_radius [1]
+  +Distance tractor_range [1]
+  +Speed tractor_speed [1]
 }
-class EnemyType {
-  +Amount fuel_drop [1]
+class RaiderType {
+  +Amount fuel_yield [1]
   +Distance detection_range [1]
+  +Distance keep_distance [1]
 }
 class AsteroidType {
   +Distance radius [1]
-  +Amount fuel_drop [1]
+  +Amount fuel_yield [1]
   +Amount max_integrity [1]
 }
 class Galaxy {
@@ -67,14 +69,14 @@ class StarSystem {
   +Distance bounds_radius [1]
   +Amount jump_fuel_cost [1]
 }
-class SpawnRegion {
+class Region {
   <<abstract>>
   +Distance radius [1]
-  +integer spawn_count [1]
+  +integer count [1]
 }
 class AsteroidField {
 }
-class EnemyGroup {
+class RaiderPack {
 }
 class SpectralClass {
   <<enumeration>>
@@ -86,45 +88,40 @@ class SpectralClass {
   k
   m
 }
-NamedThing <|-- ContentPack
-ContentPack *-- "*" WeaponType : weapon_types
-ContentPack *-- "*" ShipClass : ship_classes
-ContentPack *-- "*" EnemyType : enemy_types
-ContentPack *-- "*" AsteroidType : asteroid_types
-ContentPack --> "1" ShipClass : starting_ship_class
-ContentPack *-- "1" Galaxy : galaxy
 NamedThing <|-- WeaponType
 NamedThing <|-- ShipClass
 ShipClass --> "*" WeaponType : weapons
-NamedThing <|-- EnemyType
-EnemyType --> "1" ShipClass : ship_class
+NamedThing <|-- RaiderType
+RaiderType --> "1" ShipClass : ship_class
 NamedThing <|-- AsteroidType
 NamedThing <|-- Galaxy
+Galaxy *-- "*" WeaponType : weapon_types
+Galaxy *-- "*" ShipClass : ship_classes
+Galaxy *-- "*" RaiderType : raider_types
+Galaxy *-- "*" AsteroidType : asteroid_types
 Galaxy *-- "1..*" StarSystem : star_systems
-Galaxy --> "1" StarSystem : starting_system
 NamedThing <|-- StarSystem
 StarSystem ..> SpectralClass : star_class
 StarSystem --> "*" StarSystem : jump_targets
 StarSystem *-- "*" AsteroidField : asteroid_fields
-StarSystem *-- "*" EnemyGroup : enemy_groups
-SpawnRegion *-- "1" Vector3D : center
-SpawnRegion <|-- AsteroidField
+StarSystem *-- "*" RaiderPack : raider_packs
+Region *-- "1" Vector3D : center
+Region <|-- AsteroidField
 AsteroidField --> "1" AsteroidType : asteroid_type
-SpawnRegion <|-- EnemyGroup
-EnemyGroup --> "1" EnemyType : enemy_type
+Region <|-- RaiderPack
+RaiderPack --> "1" RaiderType : raider_type
 ```
 
 ## State
 
-Persisted and replicated session state, rooted at GameSession.
+What is where at one moment, rooted at GalaxyState.
 
 ```mermaid
 classDiagram
-class GameSession {
+class GalaxyState {
   +string id [1]
-  +integer max_players [1]
 }
-class Player {
+class Pilot {
 }
 class StarSystemState {
 }
@@ -136,45 +133,37 @@ class Ship {
   <<abstract>>
   +Amount hull [1]
 }
-class PlayerShip {
+class PilotShip {
   +Amount fuel [1]
 }
-class EnemyShip {
+class RaiderShip {
 }
 class Asteroid {
   +Amount integrity [1]
 }
-class LootDrop {
+class FuelPod {
   +Amount fuel_amount [1]
 }
-class HostingMode {
-  <<enumeration>>
-  solo
-  player_hosted
-  dedicated_server
-}
-GameSession --> "1" ContentPack : content_pack
-GameSession ..> HostingMode : hosting_mode
-GameSession --> "0..1" Player : host
-GameSession *-- "1..*" Player : players
-GameSession *-- "*" PlayerShip : player_ships
-GameSession *-- "*" StarSystemState : system_states
-NamedThing <|-- Player
+GalaxyState --> "1" Galaxy : galaxy
+GalaxyState *-- "1..*" Pilot : pilots
+GalaxyState *-- "*" PilotShip : pilot_ships
+GalaxyState *-- "*" StarSystemState : system_states
+NamedThing <|-- Pilot
 StarSystemState --> "1" StarSystem : star_system
 StarSystemState *-- "*" Asteroid : asteroids
-StarSystemState *-- "*" EnemyShip : enemy_ships
-StarSystemState *-- "*" LootDrop : loot_drops
+StarSystemState *-- "*" RaiderShip : raider_ships
+StarSystemState *-- "*" FuelPod : fuel_pods
 SpaceEntity *-- "1" Vector3D : position
 SpaceEntity *-- "0..1" Vector3D : velocity
 SpaceEntity *-- "0..1" Attitude : orientation
 SpaceEntity <|-- Ship
-Ship <|-- PlayerShip
-PlayerShip --> "1" ShipClass : ship_class
-PlayerShip --> "1" Player : pilot
-PlayerShip --> "1" StarSystem : current_system
-Ship <|-- EnemyShip
-EnemyShip --> "1" EnemyType : enemy_type
+Ship <|-- PilotShip
+PilotShip --> "1" ShipClass : ship_class
+PilotShip --> "1" Pilot : pilot
+PilotShip --> "1" StarSystem : current_system
+Ship <|-- RaiderShip
+RaiderShip --> "1" RaiderType : raider_type
 SpaceEntity <|-- Asteroid
 Asteroid --> "1" AsteroidType : asteroid_type
-SpaceEntity <|-- LootDrop
+SpaceEntity <|-- FuelPod
 ```

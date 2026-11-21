@@ -1,0 +1,69 @@
+# A small galaxy: two systems in a line, one weapon, two hulls.
+id: milky_way
+name: Milky Way
+weapon_types:
+  - id: pulse_laser
+    name: Pulse laser
+    damage: 10
+    fire_rate: 4
+    projectile_speed: 600
+    max_range: 1200
+ship_classes:
+  - id: scout
+    name: Scout
+    max_hull: 100
+    max_speed: 250
+    acceleration: 80
+    turn_rate: 2.5
+    fuel_capacity: 100
+    scoop_radius: 30
+    tractor_range: 250
+    tractor_speed: 220
+    weapons: [pulse_laser]
+  - id: cutter
+    name: Cutter
+    max_hull: 40
+    max_speed: 200
+    acceleration: 60
+    turn_rate: 2.0
+    fuel_capacity: 0
+    scoop_radius: 0
+    tractor_range: 0
+    tractor_speed: 0
+    weapons: [pulse_laser]
+raider_types:
+  - id: pirate
+    name: Pirate
+    ship_class: cutter
+    detection_range: 800
+    keep_distance: 250
+    fuel_yield: 15
+asteroid_types:
+  - id: ice_rock
+    name: Ice rock
+    radius: 20
+    max_integrity: 50
+    fuel_yield: 10
+star_systems:
+  - id: sol
+    name: Sol
+    star_class: g
+    bounds_radius: 10000
+    jump_fuel_cost: 60
+    jump_targets: [alpha_centauri]
+    asteroid_fields:
+      - asteroid_type: ice_rock
+        center: {x: 2000, y: 0, z: 500}
+        radius: 800
+        count: 12
+    raider_packs:
+      - raider_type: pirate
+        center: {x: -3000, y: 200, z: 0}
+        radius: 500
+        count: 3
+  - id: alpha_centauri
+    name: Alpha Centauri
+    star_class: g
+    bounds_radius: 12000
+    jump_fuel_cost: 80
+    jump_targets: [sol]

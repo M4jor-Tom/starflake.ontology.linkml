@@ -5,16 +5,20 @@ title: Starflake ontology
 description: |-
   Domain ontology for Starflake, an open-world 3D space explorer.
 
-  The pilot flies a ship through a galaxy of star systems, shoots enemies and
-  asteroids, loots the fuel they drop, and jumps to a neighbouring system once
-  the tank holds enough fuel.
+  A pilot flies a ship through a galaxy of star systems, shoots raiders and
+  asteroids, scoops up the fuel they leave, and jumps to a neighbouring system
+  once the tank holds enough fuel.
+
+  The ontology describes the universe only, in words one of its inhabitants
+  would use. How the game is played, hosted and tuned is specified in the
+  design repository.
 
   The schema has two layers:
 
-  * **Content** (`ContentPack`): static, designer-authored definitions such as
-    ship classes, weapons, enemy and asteroid types, and the galaxy map.
-  * **State** (`GameSession`): the persisted, replicable state of one play
-    session, which references content by identifier.
+  * **Content** (`Galaxy`): what exists, such as ship classes, weapons,
+    raider and asteroid types, and the star systems.
+  * **State** (`GalaxyState`): what is where at one moment, which references
+    content by identifier.
 
   Units: distances in metres, time in seconds, angles in radians.
 license: Apache-2.0
@@ -35,9 +39,9 @@ subsets:
   core:
     description: Building blocks shared by content and state.
   content:
-    description: Static, designer-authored definitions bundled in a ContentPack.
+    description: What exists in a galaxy, rooted at Galaxy.
   state:
-    description: Persisted and replicated session state, rooted at GameSession.
+    description: What is where at one moment, rooted at GalaxyState.
 
 types:
   Amount:
@@ -94,45 +98,6 @@ classes:
 
   # ------------------------------------------------------------ content
 
-  ContentPack:
-    in_subset: [content]
-    tree_root: true
-    is_a: NamedThing
-    description: >-
-      A versioned bundle of designer-authored content. Everything a session
-      references by identifier is defined here.
-    attributes:
-      weapon_types:
-        description: Weapons available to ship classes.
-        range: WeaponType
-        multivalued: true
-        inlined_as_list: true
-      ship_classes:
-        description: Hull designs available to player and enemy ships.
-        range: ShipClass
-        multivalued: true
-        inlined_as_list: true
-      enemy_types:
-        description: Hostile archetypes that can spawn in star systems.
-        range: EnemyType
-        multivalued: true
-        inlined_as_list: true
-      asteroid_types:
-        description: Asteroid kinds that can spawn in star systems.
-        range: AsteroidType
-        multivalued: true
-        inlined_as_list: true
-      starting_ship_class:
-        description: The hull every new player ship is built from.
-        range: ShipClass
-        required: true
-        inlined: false
-      galaxy:
-        description: The map played with this content.
-        range: Galaxy
-        required: true
-        inlined: true
-
   WeaponType:
     in_subset: [content]
     is_a: NamedThing
@@ -153,14 +118,14 @@ classes:
         range: Speed
         required: true
       max_range:
-        description: Distance after which a projectile despawns.
+        description: Distance after which a projectile dissipates.
         range: Distance
         required: true
 
   ShipClass:
     in_subset: [content]
     is_a: NamedThing
-    description: A hull design that player and enemy ships are built from.
+    description: A hull design that pilot and raider ships are built from.
     attributes:
       max_hull:
         description: Hull points of an undamaged ship.
@@ -186,24 +151,42 @@ classes:
         description: Maximum fuel the tank holds. Zero for ships that never jump.
         range: Amount
         required: true
+      scoop_radius:
+        description: >-
+          Distance within which the fuel scoop takes in a fuel pod. Zero for
+          ships without a scoop.
+        range: Distance
+        required: true
+      tractor_range:
+        description: Distance within which the ship pulls fuel pods toward itself.
+        range: Distance
+        required: true
+      tractor_speed:
+        description: Speed at which a pulled fuel pod moves toward the ship.
+        range: Speed
+        required: true
       weapons:
         description: Weapons mounted on every ship of this class.
         range: WeaponType
         multivalued: true
         inlined: false
 
-  EnemyType:
+  RaiderType:
     in_subset: [content]
     is_a: NamedThing
     description: >-
-      A hostile AI pilot archetype: which hull it flies, when it engages, and
-      what it drops when destroyed.
+      A raider archetype: which hull it flies, when it engages, how close it
+      fights, and what it leaves when destroyed.
     slots:
       - ship_class
-      - fuel_drop
+      - fuel_yield
     attributes:
       detection_range:
-        description: Distance at which the enemy notices and chases a player ship.
+        description: Distance within which the raider notices and chases a pilot ship.
+        range: Distance
+        required: true
+      keep_distance:
+        description: Distance from its target at which the raider stops closing in.
         range: Distance
         required: true
 
@@ -212,10 +195,10 @@ classes:
     is_a: NamedThing
     description: >-
       A kind of asteroid. Shooting it until its integrity reaches zero breaks
-      it and leaves a fuel loot drop.
+      it and leaves a fuel pod.
     slots:
       - radius
-      - fuel_drop
+      - fuel_yield
     slot_usage:
       radius:
         description: Collision radius of the asteroid.
@@ -227,26 +210,44 @@ classes:
 
   Galaxy:
     in_subset: [content]
+    tree_root: true
     is_a: NamedThing
-    description: The map of star systems connected by jump routes.
+    description: >-
+      Star systems connected by jump routes, and the kinds of ships, weapons,
+      raiders and asteroids found among them.
     attributes:
+      weapon_types:
+        description: Weapons that ship classes mount.
+        range: WeaponType
+        multivalued: true
+        inlined_as_list: true
+      ship_classes:
+        description: Hull designs that pilot and raider ships are built from.
+        range: ShipClass
+        multivalued: true
+        inlined_as_list: true
+      raider_types:
+        description: Raider archetypes that roam the star systems.
+        range: RaiderType
+        multivalued: true
+        inlined_as_list: true
+      asteroid_types:
+        description: Asteroid kinds found in the star systems.
+        range: AsteroidType
+        multivalued: true
+        inlined_as_list: true
       star_systems:
         description: Every star system of the galaxy.
         range: StarSystem
         multivalued: true
         required: true
         inlined_as_list: true
-      starting_system:
-        description: Where new player ships spawn.
-        range: StarSystem
-        required: true
-        inlined: false
 
   StarSystem:
     in_subset: [content]
     is_a: NamedThing
     description: >-
-      One playable area around a star. A player ship can jump to any system in
+      The space around one star. A pilot ship can jump to any system in
       jump_targets once it carries at least jump_fuel_cost fuel.
     attributes:
       star_class:
@@ -254,7 +255,7 @@ classes:
         range: SpectralClass
         required: true
       bounds_radius:
-        description: Radius of the playable sphere centred on the star.
+        description: Radius of the navigable sphere centred on the star.
         range: Distance
         required: true
       jump_fuel_cost:
@@ -267,129 +268,95 @@ classes:
         multivalued: true
         inlined: false
       asteroid_fields:
-        description: Asteroid spawn regions in this system.
+        description: Asteroid fields of this system.
         range: AsteroidField
         multivalued: true
         inlined_as_list: true
-      enemy_groups:
-        description: Enemy spawn regions in this system.
-        range: EnemyGroup
+      raider_packs:
+        description: Raider packs of this system.
+        range: RaiderPack
         multivalued: true
         inlined_as_list: true
 
-  SpawnRegion:
+  Region:
     in_subset: [content]
     abstract: true
-    description: >-
-      A sphere inside a star system where a number of entities spawn when the
-      system state is first created.
+    description: A sphere inside a star system that holds a number of bodies.
     slots:
       - radius
     slot_usage:
       radius:
-        description: Radius of the spawn sphere.
+        description: Radius of the region.
     attributes:
       center:
         description: Centre of the region, relative to the star.
         range: Vector3D
         required: true
         inlined: true
-      spawn_count:
-        description: Number of entities spawned in the region.
+      count:
+        description: Number of bodies the region holds.
         range: integer
         required: true
         minimum_value: 1
 
   AsteroidField:
     in_subset: [content]
-    is_a: SpawnRegion
+    is_a: Region
     description: A region filled with asteroids of one type.
     slots:
       - asteroid_type
 
-  EnemyGroup:
+  RaiderPack:
     in_subset: [content]
-    is_a: SpawnRegion
-    description: A region where enemies of one type spawn.
+    is_a: Region
+    description: A region that raiders of one type hold.
     slots:
-      - enemy_type
+      - raider_type
 
   # ------------------------------------------------------------ state
 
-  GameSession:
+  GalaxyState:
     in_subset: [state]
     description: >-
-      The persisted state of one play session: a save file in solo, the
-      authoritative world on a host or dedicated server in multiplayer.
+      What is where in a galaxy at one moment: its pilots, their ships, and
+      the state of the star systems visited so far.
     slots:
       - id
     attributes:
-      content_pack:
-        description: The content this session was created with.
-        range: ContentPack
+      galaxy:
+        description: The galaxy this is the state of.
+        range: Galaxy
         required: true
         inlined: false
-      hosting_mode:
-        description: Who runs the authoritative simulation.
-        range: HostingMode
-        required: true
-      host:
-        description: The player hosting the session. Absent on a dedicated server.
-        range: Player
-        inlined: false
-      max_players:
-        description: Maximum number of players allowed at once.
-        range: integer
-        required: true
-        minimum_value: 1
-      players:
-        description: Everyone who has joined the session.
-        range: Player
+      pilots:
+        description: Everyone who flies a ship in the galaxy.
+        range: Pilot
         multivalued: true
         required: true
         inlined_as_list: true
-      player_ships:
-        description: The ship of each player.
-        range: PlayerShip
+      pilot_ships:
+        description: The ship of each pilot.
+        range: PilotShip
         multivalued: true
         inlined_as_list: true
       system_states:
         description: >-
           State of the systems visited so far. A system without state has not
-          been generated yet.
+          been visited yet.
         range: StarSystemState
         multivalued: true
         inlined_as_list: true
-    rules:
-      - description: Solo sessions hold exactly one player.
-        preconditions:
-          slot_conditions:
-            hosting_mode:
-              equals_string: solo
-        postconditions:
-          slot_conditions:
-            max_players:
-              equals_number: 1
-      - description: No player hosts a session that runs on a dedicated server.
-        preconditions:
-          slot_conditions:
-            hosting_mode:
-              equals_string: dedicated_server
-        postconditions:
-          slot_conditions:
-            host:
-              value_presence: ABSENT
 
-  Player:
+  Pilot:
     in_subset: [state]
     is_a: NamedThing
-    description: A person taking part in a session. Its name is shown to other players.
+    description: A person who flies a ship. Other pilots know them by name.
 
   StarSystemState:
     in_subset: [state]
     description: >-
-      The world state of one star system within a session: what remains of
-      its asteroids and enemies, and the loot floating there.
+      The state of one star system: what remains of its asteroids and
+      raiders, and the fuel pods floating there.
     attributes:
       star_system:
         description: The star system this state belongs to.
@@ -401,14 +368,14 @@ classes:
         range: Asteroid
         multivalued: true
         inlined_as_list: true
-      enemy_ships:
-        description: Enemy ships not destroyed yet.
-        range: EnemyShip
+      raider_ships:
+        description: Raider ships not destroyed yet.
+        range: RaiderShip
         multivalued: true
         inlined_as_list: true
-      loot_drops:
-        description: Fuel not collected yet.
-        range: LootDrop
+      fuel_pods:
+        description: Fuel pods not scooped up yet.
+        range: FuelPod
         multivalued: true
         inlined_as_list: true
 
@@ -416,8 +383,7 @@ classes:
     in_subset: [state]
     abstract: true
     description: >-
-      Anything with a physical presence in a star system. The identifier
-      doubles as the network id in multiplayer.
+      Anything with a physical presence in a star system.
     slots:
       - id
     attributes:
@@ -446,16 +412,16 @@ classes:
         range: Amount
         required: true
 
-  PlayerShip:
+  PilotShip:
     in_subset: [state]
     is_a: Ship
-    description: A ship flown by a player.
+    description: A ship flown by a pilot.
     slots:
       - ship_class
     attributes:
       pilot:
-        description: The player flying the ship.
-        range: Player
+        description: The pilot flying the ship.
+        range: Pilot
         required: true
         inlined: false
       current_system:
@@ -468,17 +434,17 @@ classes:
         range: Amount
         required: true
 
-  EnemyShip:
+  RaiderShip:
     in_subset: [state]
     is_a: Ship
-    description: A hostile AI ship. Its hull design comes from its enemy type.
+    description: A hostile ship. Its hull design comes from its raider type.
     slots:
-      - enemy_type
+      - raider_type
 
   Asteroid:
     in_subset: [state]
     is_a: SpaceEntity
-    description: An asteroid that breaks into a fuel loot drop when shot enough.
+    description: An asteroid that breaks into a fuel pod when shot enough.
     slots:
       - asteroid_type
     attributes:
@@ -487,13 +453,13 @@ classes:
         range: Amount
         required: true
 
-  LootDrop:
+  FuelPod:
     in_subset: [state]
     is_a: SpaceEntity
-    description: Fuel floating in space, collected by flying a player ship into it.
+    description: Fuel floating in space, scooped up by a pilot ship that flies into it.
     attributes:
       fuel_amount:
-        description: Fuel collected by picking up this drop.
+        description: Fuel the pod holds.
         range: Amount
         required: true
 
@@ -530,8 +496,8 @@ slots:
     description: Radius of a sphere.
     range: Distance
     required: true
-  fuel_drop:
-    description: Fuel in the loot drop left when this is destroyed.
+  fuel_yield:
+    description: Fuel in the pod left when this is destroyed.
     range: Amount
     required: true
   ship_class:
@@ -544,9 +510,9 @@ slots:
     range: AsteroidType
     required: true
     inlined: false
-  enemy_type:
-    description: The enemy archetype.
-    range: EnemyType
+  raider_type:
+    description: The raider archetype.
+    range: RaiderType
     required: true
     inlined: false
 
@@ -577,14 +543,3 @@ enums:
       m:
         title: M
         description: Red, below 3,700 K.
-
-  HostingMode:
-    in_subset: [state]
-    description: Who runs the authoritative simulation of a session.
-    permissible_values:
-      solo:
-        description: Single player, simulated locally, no network.
-      player_hosted:
-        description: A player's game acts as server for the players they invite.
-      dedicated_server:
-        description: A server not run by any player hosts the session.

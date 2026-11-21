@@ -1,0 +1,9 @@
+# Invalid: "x" is not a spectral class.
+id: g
+name: G
+star_systems:
+  - id: s
+    name: S
+    star_class: x
+    bounds_radius: 1
+    jump_fuel_cost: 1

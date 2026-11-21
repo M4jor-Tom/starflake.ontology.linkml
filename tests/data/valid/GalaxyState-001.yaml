@@ -1,15 +1,12 @@
-# A solo save after the first fight in Sol.
-id: session-42
-content_pack: core
-hosting_mode: solo
-max_players: 1
-host: player-1
-players:
-  - id: player-1
+# The Milky Way after one pilot's first fight in Sol.
+id: state-42
+galaxy: milky_way
+pilots:
+  - id: pilot-1
     name: Theta
-player_ships:
+pilot_ships:
   - id: ship-1
-    pilot: player-1
+    pilot: pilot-1
     ship_class: scout
     current_system: sol
     hull: 85
@@ -24,12 +21,12 @@ system_states:
         asteroid_type: ice_rock
         integrity: 20
         position: {x: 2100, y: 30, z: 450}
-    enemy_ships:
-      - id: enemy-1
-        enemy_type: pirate
+    raider_ships:
+      - id: raider-1
+        raider_type: pirate
         hull: 40
         position: {x: -2950, y: 180, z: 20}
-    loot_drops:
-      - id: loot-1
+    fuel_pods:
+      - id: pod-1
         fuel_amount: 10
         position: {x: 1950, y: 15, z: 470}

@@ -1,12 +1,14 @@
 name: starflake-ontology
 description: "Domain ontology for Starflake, an open-world 3D space explorer.\n\n\
-  The pilot flies a ship through a galaxy of star systems, shoots enemies and\nasteroids,\
-  \ loots the fuel they drop, and jumps to a neighbouring system once\nthe tank holds\
-  \ enough fuel.\n\nThe schema has two layers:\n\n* **Content** (`ContentPack`): static,\
-  \ designer-authored definitions such as\n  ship classes, weapons, enemy and asteroid\
-  \ types, and the galaxy map.\n* **State** (`GameSession`): the persisted, replicable\
-  \ state of one play\n  session, which references content by identifier.\n\nUnits:\
-  \ distances in metres, time in seconds, angles in radians."
+  A pilot flies a ship through a galaxy of star systems, shoots raiders and\nasteroids,\
+  \ scoops up the fuel they leave, and jumps to a neighbouring system\nonce the tank\
+  \ holds enough fuel.\n\nThe ontology describes the universe only, in words one of\
+  \ its inhabitants\nwould use. How the game is played, hosted and tuned is specified\
+  \ in the\ndesign repository.\n\nThe schema has two layers:\n\n* **Content** (`Galaxy`):\
+  \ what exists, such as ship classes, weapons,\n  raider and asteroid types, and\
+  \ the star systems.\n* **State** (`GalaxyState`): what is where at one moment, which\
+  \ references\n  content by identifier.\n\nUnits: distances in metres, time in seconds,\
+  \ angles in radians."
 title: Starflake ontology
 see_also:
 - https://M4jor-Tom.github.io/starflake-ontology
@@ -35,12 +37,12 @@ subsets:
   content:
     name: content
     definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/Content
-    description: Static, designer-authored definitions bundled in a ContentPack.
+    description: What exists in a galaxy, rooted at Galaxy.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
   state:
     name: state
     definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/State
-    description: Persisted and replicated session state, rooted at GameSession.
+    description: What is where at one moment, rooted at GalaxyState.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
 types:
   Amount:
@@ -379,23 +381,6 @@ enums:
         text: m
         description: Red, below 3,700 K.
         title: M
-  HostingMode:
-    name: HostingMode
-    definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/HostingMode
-    description: Who runs the authoritative simulation of a session.
-    in_subset:
-    - state
-    from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
-    permissible_values:
-      solo:
-        text: solo
-        description: Single player, simulated locally, no network.
-      player_hosted:
-        text: player_hosted
-        description: A player's game acts as server for the players they invite.
-      dedicated_server:
-        text: dedicated_server
-        description: A server not run by any player hosts the session.
 slots:
   id:
     name: id
@@ -409,7 +394,7 @@ slots:
     owner: SpaceEntity
     domain_of:
     - NamedThing
-    - GameSession
+    - GalaxyState
     - SpaceEntity
     range: string
     required: true
@@ -491,21 +476,21 @@ slots:
     description: Radius of a sphere.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
     slot_uri: starflake:radius
-    owner: SpawnRegion
+    owner: Region
     domain_of:
     - AsteroidType
-    - SpawnRegion
+    - Region
     range: Distance
     required: true
-  fuel_drop:
-    name: fuel_drop
-    definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/fuel_drop
-    description: Fuel in the loot drop left when this is destroyed.
+  fuel_yield:
+    name: fuel_yield
+    definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/fuel_yield
+    description: Fuel in the pod left when this is destroyed.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
-    slot_uri: starflake:fuel_drop
+    slot_uri: starflake:fuel_yield
     owner: AsteroidType
     domain_of:
-    - EnemyType
+    - RaiderType
     - AsteroidType
     range: Amount
     required: true
@@ -515,10 +500,10 @@ slots:
     description: The hull design.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
     slot_uri: starflake:ship_class
-    owner: PlayerShip
+    owner: PilotShip
     domain_of:
-    - EnemyType
-    - PlayerShip
+    - RaiderType
+    - PilotShip
     range: ShipClass
     required: true
     inlined: false
@@ -535,96 +520,19 @@ slots:
     range: AsteroidType
     required: true
     inlined: false
-  enemy_type:
-    name: enemy_type
-    definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/enemy_type
-    description: The enemy archetype.
+  raider_type:
+    name: raider_type
+    definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/raider_type
+    description: The raider archetype.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
-    slot_uri: starflake:enemy_type
-    owner: EnemyShip
+    slot_uri: starflake:raider_type
+    owner: RaiderShip
     domain_of:
-    - EnemyGroup
-    - EnemyShip
-    range: EnemyType
+    - RaiderPack
+    - RaiderShip
+    range: RaiderType
     required: true
     inlined: false
-  contentPack__weapon_types:
-    name: contentPack__weapon_types
-    description: Weapons available to ship classes.
-    from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
-    slot_uri: starflake:weapon_types
-    alias: weapon_types
-    owner: ContentPack
-    domain_of:
-    - ContentPack
-    range: WeaponType
-    multivalued: true
-    inlined: true
-    inlined_as_list: true
-  contentPack__ship_classes:
-    name: contentPack__ship_classes
-    description: Hull designs available to player and enemy ships.
-    from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
-    slot_uri: starflake:ship_classes
-    alias: ship_classes
-    owner: ContentPack
-    domain_of:
-    - ContentPack
-    range: ShipClass
-    multivalued: true
-    inlined: true
-    inlined_as_list: true
-  contentPack__enemy_types:
-    name: contentPack__enemy_types
-    description: Hostile archetypes that can spawn in star systems.
-    from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
-    slot_uri: starflake:enemy_types
-    alias: enemy_types
-    owner: ContentPack
-    domain_of:
-    - ContentPack
-    range: EnemyType
-    multivalued: true
-    inlined: true
-    inlined_as_list: true
-  contentPack__asteroid_types:
-    name: contentPack__asteroid_types
-    description: Asteroid kinds that can spawn in star systems.
-    from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
-    slot_uri: starflake:asteroid_types
-    alias: asteroid_types
-    owner: ContentPack
-    domain_of:
-    - ContentPack
-    range: AsteroidType
-    multivalued: true
-    inlined: true
-    inlined_as_list: true
-  contentPack__starting_ship_class:
-    name: contentPack__starting_ship_class
-    description: The hull every new player ship is built from.
-    from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
-    slot_uri: starflake:starting_ship_class
-    alias: starting_ship_class
-    owner: ContentPack
-    domain_of:
-    - ContentPack
-    range: ShipClass
-    required: true
-    inlined: false
-  contentPack__galaxy:
-    name: contentPack__galaxy
-    description: The map played with this content.
-    from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
-    slot_uri: starflake:galaxy
-    alias: galaxy
-    owner: ContentPack
-    domain_of:
-    - ContentPack
-    range: Galaxy
-    required: true
-    inlined: true
-    inlined_as_list: false
   weaponType__damage:
     name: weaponType__damage
     description: Hull or integrity points removed per hit.
@@ -662,7 +570,7 @@ slots:
     required: true
   weaponType__max_range:
     name: weaponType__max_range
-    description: Distance after which a projectile despawns.
+    description: Distance after which a projectile dissipates.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
     slot_uri: starflake:max_range
     alias: max_range
@@ -730,6 +638,40 @@ slots:
     - ShipClass
     range: Amount
     required: true
+  shipClass__scoop_radius:
+    name: shipClass__scoop_radius
+    description: Distance within which the fuel scoop takes in a fuel pod. Zero for
+      ships without a scoop.
+    from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
+    slot_uri: starflake:scoop_radius
+    alias: scoop_radius
+    owner: ShipClass
+    domain_of:
+    - ShipClass
+    range: Distance
+    required: true
+  shipClass__tractor_range:
+    name: shipClass__tractor_range
+    description: Distance within which the ship pulls fuel pods toward itself.
+    from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
+    slot_uri: starflake:tractor_range
+    alias: tractor_range
+    owner: ShipClass
+    domain_of:
+    - ShipClass
+    range: Distance
+    required: true
+  shipClass__tractor_speed:
+    name: shipClass__tractor_speed
+    description: Speed at which a pulled fuel pod moves toward the ship.
+    from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
+    slot_uri: starflake:tractor_speed
+    alias: tractor_speed
+    owner: ShipClass
+    domain_of:
+    - ShipClass
+    range: Speed
+    required: true
   shipClass__weapons:
     name: shipClass__weapons
     description: Weapons mounted on every ship of this class.
@@ -742,15 +684,26 @@ slots:
     range: WeaponType
     multivalued: true
     inlined: false
-  enemyType__detection_range:
-    name: enemyType__detection_range
-    description: Distance at which the enemy notices and chases a player ship.
+  raiderType__detection_range:
+    name: raiderType__detection_range
+    description: Distance within which the raider notices and chases a pilot ship.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
     slot_uri: starflake:detection_range
     alias: detection_range
-    owner: EnemyType
+    owner: RaiderType
     domain_of:
-    - EnemyType
+    - RaiderType
+    range: Distance
+    required: true
+  raiderType__keep_distance:
+    name: raiderType__keep_distance
+    description: Distance from its target at which the raider stops closing in.
+    from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
+    slot_uri: starflake:keep_distance
+    alias: keep_distance
+    owner: RaiderType
+    domain_of:
+    - RaiderType
     range: Distance
     required: true
   asteroidType__max_integrity:
@@ -764,6 +717,58 @@ slots:
     - AsteroidType
     range: Amount
     required: true
+  galaxy__weapon_types:
+    name: galaxy__weapon_types
+    description: Weapons that ship classes mount.
+    from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
+    slot_uri: starflake:weapon_types
+    alias: weapon_types
+    owner: Galaxy
+    domain_of:
+    - Galaxy
+    range: WeaponType
+    multivalued: true
+    inlined: true
+    inlined_as_list: true
+  galaxy__ship_classes:
+    name: galaxy__ship_classes
+    description: Hull designs that pilot and raider ships are built from.
+    from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
+    slot_uri: starflake:ship_classes
+    alias: ship_classes
+    owner: Galaxy
+    domain_of:
+    - Galaxy
+    range: ShipClass
+    multivalued: true
+    inlined: true
+    inlined_as_list: true
+  galaxy__raider_types:
+    name: galaxy__raider_types
+    description: Raider archetypes that roam the star systems.
+    from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
+    slot_uri: starflake:raider_types
+    alias: raider_types
+    owner: Galaxy
+    domain_of:
+    - Galaxy
+    range: RaiderType
+    multivalued: true
+    inlined: true
+    inlined_as_list: true
+  galaxy__asteroid_types:
+    name: galaxy__asteroid_types
+    description: Asteroid kinds found in the star systems.
+    from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
+    slot_uri: starflake:asteroid_types
+    alias: asteroid_types
+    owner: Galaxy
+    domain_of:
+    - Galaxy
+    range: AsteroidType
+    multivalued: true
+    inlined: true
+    inlined_as_list: true
   galaxy__star_systems:
     name: galaxy__star_systems
     description: Every star system of the galaxy.
@@ -778,18 +783,6 @@ slots:
     multivalued: true
     inlined: true
     inlined_as_list: true
-  galaxy__starting_system:
-    name: galaxy__starting_system
-    description: Where new player ships spawn.
-    from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
-    slot_uri: starflake:starting_system
-    alias: starting_system
-    owner: Galaxy
-    domain_of:
-    - Galaxy
-    range: StarSystem
-    required: true
-    inlined: false
   starSystem__star_class:
     name: starSystem__star_class
     description: Spectral class of the star, driving its look.
@@ -803,7 +796,7 @@ slots:
     required: true
   starSystem__bounds_radius:
     name: starSystem__bounds_radius
-    description: Radius of the playable sphere centred on the star.
+    description: Radius of the navigable sphere centred on the star.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
     slot_uri: starflake:bounds_radius
     alias: bounds_radius
@@ -837,7 +830,7 @@ slots:
     inlined: false
   starSystem__asteroid_fields:
     name: starSystem__asteroid_fields
-    description: Asteroid spawn regions in this system.
+    description: Asteroid fields of this system.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
     slot_uri: starflake:asteroid_fields
     alias: asteroid_fields
@@ -848,127 +841,93 @@ slots:
     multivalued: true
     inlined: true
     inlined_as_list: true
-  starSystem__enemy_groups:
-    name: starSystem__enemy_groups
-    description: Enemy spawn regions in this system.
+  starSystem__raider_packs:
+    name: starSystem__raider_packs
+    description: Raider packs of this system.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
-    slot_uri: starflake:enemy_groups
-    alias: enemy_groups
+    slot_uri: starflake:raider_packs
+    alias: raider_packs
     owner: StarSystem
     domain_of:
     - StarSystem
-    range: EnemyGroup
+    range: RaiderPack
     multivalued: true
     inlined: true
     inlined_as_list: true
-  spawnRegion__center:
-    name: spawnRegion__center
+  region__center:
+    name: region__center
     description: Centre of the region, relative to the star.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
     slot_uri: starflake:center
     alias: center
-    owner: SpawnRegion
+    owner: Region
     domain_of:
-    - SpawnRegion
+    - Region
     range: Vector3D
     required: true
     inlined: true
     inlined_as_list: true
-  spawnRegion__spawn_count:
-    name: spawnRegion__spawn_count
-    description: Number of entities spawned in the region.
+  region__count:
+    name: region__count
+    description: Number of bodies the region holds.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
-    slot_uri: starflake:spawn_count
-    alias: spawn_count
-    owner: SpawnRegion
+    slot_uri: starflake:count
+    alias: count
+    owner: Region
     domain_of:
-    - SpawnRegion
+    - Region
     range: integer
     required: true
     minimum_value: 1
-  gameSession__content_pack:
-    name: gameSession__content_pack
-    description: The content this session was created with.
+  galaxyState__galaxy:
+    name: galaxyState__galaxy
+    description: The galaxy this is the state of.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
-    slot_uri: starflake:content_pack
-    alias: content_pack
-    owner: GameSession
+    slot_uri: starflake:galaxy
+    alias: galaxy
+    owner: GalaxyState
     domain_of:
-    - GameSession
-    range: ContentPack
+    - GalaxyState
+    range: Galaxy
     required: true
     inlined: false
-  gameSession__hosting_mode:
-    name: gameSession__hosting_mode
-    description: Who runs the authoritative simulation.
+  galaxyState__pilots:
+    name: galaxyState__pilots
+    description: Everyone who flies a ship in the galaxy.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
-    slot_uri: starflake:hosting_mode
-    alias: hosting_mode
-    owner: GameSession
+    slot_uri: starflake:pilots
+    alias: pilots
+    owner: GalaxyState
     domain_of:
-    - GameSession
-    range: HostingMode
-    required: true
-  gameSession__host:
-    name: gameSession__host
-    description: The player hosting the session. Absent on a dedicated server.
-    from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
-    slot_uri: starflake:host
-    alias: host
-    owner: GameSession
-    domain_of:
-    - GameSession
-    range: Player
-    inlined: false
-  gameSession__max_players:
-    name: gameSession__max_players
-    description: Maximum number of players allowed at once.
-    from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
-    slot_uri: starflake:max_players
-    alias: max_players
-    owner: GameSession
-    domain_of:
-    - GameSession
-    range: integer
-    required: true
-    minimum_value: 1
-  gameSession__players:
-    name: gameSession__players
-    description: Everyone who has joined the session.
-    from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
-    slot_uri: starflake:players
-    alias: players
-    owner: GameSession
-    domain_of:
-    - GameSession
-    range: Player
+    - GalaxyState
+    range: Pilot
     required: true
     multivalued: true
     inlined: true
     inlined_as_list: true
-  gameSession__player_ships:
-    name: gameSession__player_ships
-    description: The ship of each player.
+  galaxyState__pilot_ships:
+    name: galaxyState__pilot_ships
+    description: The ship of each pilot.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
-    slot_uri: starflake:player_ships
-    alias: player_ships
-    owner: GameSession
+    slot_uri: starflake:pilot_ships
+    alias: pilot_ships
+    owner: GalaxyState
     domain_of:
-    - GameSession
-    range: PlayerShip
+    - GalaxyState
+    range: PilotShip
     multivalued: true
     inlined: true
     inlined_as_list: true
-  gameSession__system_states:
-    name: gameSession__system_states
+  galaxyState__system_states:
+    name: galaxyState__system_states
     description: State of the systems visited so far. A system without state has not
-      been generated yet.
+      been visited yet.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
     slot_uri: starflake:system_states
     alias: system_states
-    owner: GameSession
+    owner: GalaxyState
     domain_of:
-    - GameSession
+    - GalaxyState
     range: StarSystemState
     multivalued: true
     inlined: true
@@ -998,29 +957,29 @@ slots:
     multivalued: true
     inlined: true
     inlined_as_list: true
-  starSystemState__enemy_ships:
-    name: starSystemState__enemy_ships
-    description: Enemy ships not destroyed yet.
+  starSystemState__raider_ships:
+    name: starSystemState__raider_ships
+    description: Raider ships not destroyed yet.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
-    slot_uri: starflake:enemy_ships
-    alias: enemy_ships
+    slot_uri: starflake:raider_ships
+    alias: raider_ships
     owner: StarSystemState
     domain_of:
     - StarSystemState
-    range: EnemyShip
+    range: RaiderShip
     multivalued: true
     inlined: true
     inlined_as_list: true
-  starSystemState__loot_drops:
-    name: starSystemState__loot_drops
-    description: Fuel not collected yet.
+  starSystemState__fuel_pods:
+    name: starSystemState__fuel_pods
+    description: Fuel pods not scooped up yet.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
-    slot_uri: starflake:loot_drops
-    alias: loot_drops
+    slot_uri: starflake:fuel_pods
+    alias: fuel_pods
     owner: StarSystemState
     domain_of:
     - StarSystemState
-    range: LootDrop
+    range: FuelPod
     multivalued: true
     inlined: true
     inlined_as_list: true
@@ -1072,39 +1031,39 @@ slots:
     - Ship
     range: Amount
     required: true
-  playerShip__pilot:
-    name: playerShip__pilot
-    description: The player flying the ship.
+  pilotShip__pilot:
+    name: pilotShip__pilot
+    description: The pilot flying the ship.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
     slot_uri: starflake:pilot
     alias: pilot
-    owner: PlayerShip
+    owner: PilotShip
     domain_of:
-    - PlayerShip
-    range: Player
+    - PilotShip
+    range: Pilot
     required: true
     inlined: false
-  playerShip__current_system:
-    name: playerShip__current_system
+  pilotShip__current_system:
+    name: pilotShip__current_system
     description: The star system the ship is in.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
     slot_uri: starflake:current_system
     alias: current_system
-    owner: PlayerShip
+    owner: PilotShip
     domain_of:
-    - PlayerShip
+    - PilotShip
     range: StarSystem
     required: true
     inlined: false
-  playerShip__fuel:
-    name: playerShip__fuel
+  pilotShip__fuel:
+    name: pilotShip__fuel
     description: Fuel in the tank, at most the ship class fuel_capacity.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
     slot_uri: starflake:fuel
     alias: fuel
-    owner: PlayerShip
+    owner: PilotShip
     domain_of:
-    - PlayerShip
+    - PilotShip
     range: Amount
     required: true
   asteroid__integrity:
@@ -1118,15 +1077,15 @@ slots:
     - Asteroid
     range: Amount
     required: true
-  lootDrop__fuel_amount:
-    name: lootDrop__fuel_amount
-    description: Fuel collected by picking up this drop.
+  fuelPod__fuel_amount:
+    name: fuelPod__fuel_amount
+    description: Fuel the pod holds.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
     slot_uri: starflake:fuel_amount
     alias: fuel_amount
-    owner: LootDrop
+    owner: FuelPod
     domain_of:
-    - LootDrop
+    - FuelPod
     range: Amount
     required: true
   AsteroidType_radius:
@@ -1145,18 +1104,18 @@ slots:
     usage_slot_name: radius
     range: Distance
     required: true
-  SpawnRegion_radius:
-    name: SpawnRegion_radius
+  Region_radius:
+    name: Region_radius
     definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/radius
-    description: Radius of the spawn sphere.
+    description: Radius of the region.
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
     is_a: radius
-    domain: SpawnRegion
+    domain: Region
     slot_uri: starflake:radius
     alias: radius
-    owner: SpawnRegion
+    owner: Region
     domain_of:
-    - SpawnRegion
+    - Region
     is_usage_slot: true
     usage_slot_name: radius
     range: Distance
@@ -1205,64 +1164,6 @@ classes:
     - z
     - w
     class_uri: starflake:Attitude
-  ContentPack:
-    name: ContentPack
-    definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/ContentPack
-    description: A versioned bundle of designer-authored content. Everything a session
-      references by identifier is defined here.
-    in_subset:
-    - content
-    from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
-    is_a: NamedThing
-    slots:
-    - id
-    - name
-    - description
-    - contentPack__weapon_types
-    - contentPack__ship_classes
-    - contentPack__enemy_types
-    - contentPack__asteroid_types
-    - contentPack__starting_ship_class
-    - contentPack__galaxy
-    attributes:
-      weapon_types:
-        name: weapon_types
-        description: Weapons available to ship classes.
-        range: WeaponType
-        multivalued: true
-        inlined_as_list: true
-      ship_classes:
-        name: ship_classes
-        description: Hull designs available to player and enemy ships.
-        range: ShipClass
-        multivalued: true
-        inlined_as_list: true
-      enemy_types:
-        name: enemy_types
-        description: Hostile archetypes that can spawn in star systems.
-        range: EnemyType
-        multivalued: true
-        inlined_as_list: true
-      asteroid_types:
-        name: asteroid_types
-        description: Asteroid kinds that can spawn in star systems.
-        range: AsteroidType
-        multivalued: true
-        inlined_as_list: true
-      starting_ship_class:
-        name: starting_ship_class
-        description: The hull every new player ship is built from.
-        range: ShipClass
-        required: true
-        inlined: false
-      galaxy:
-        name: galaxy
-        description: The map played with this content.
-        range: Galaxy
-        required: true
-        inlined: true
-    class_uri: starflake:ContentPack
-    tree_root: true
   WeaponType:
     name: WeaponType
     definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/WeaponType
@@ -1299,14 +1200,14 @@ classes:
         required: true
       max_range:
         name: max_range
-        description: Distance after which a projectile despawns.
+        description: Distance after which a projectile dissipates.
         range: Distance
         required: true
     class_uri: starflake:WeaponType
   ShipClass:
     name: ShipClass
     definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/ShipClass
-    description: A hull design that player and enemy ships are built from.
+    description: A hull design that pilot and raider ships are built from.
     in_subset:
     - content
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
@@ -1320,6 +1221,9 @@ classes:
     - shipClass__acceleration
     - shipClass__turn_rate
     - shipClass__fuel_capacity
+    - shipClass__scoop_radius
+    - shipClass__tractor_range
+    - shipClass__tractor_speed
     - shipClass__weapons
     attributes:
       max_hull:
@@ -1351,6 +1255,22 @@ classes:
         description: Maximum fuel the tank holds. Zero for ships that never jump.
         range: Amount
         required: true
+      scoop_radius:
+        name: scoop_radius
+        description: Distance within which the fuel scoop takes in a fuel pod. Zero
+          for ships without a scoop.
+        range: Distance
+        required: true
+      tractor_range:
+        name: tractor_range
+        description: Distance within which the ship pulls fuel pods toward itself.
+        range: Distance
+        required: true
+      tractor_speed:
+        name: tractor_speed
+        description: Speed at which a pulled fuel pod moves toward the ship.
+        range: Speed
+        required: true
       weapons:
         name: weapons
         description: Weapons mounted on every ship of this class.
@@ -1358,11 +1278,11 @@ classes:
         multivalued: true
         inlined: false
     class_uri: starflake:ShipClass
-  EnemyType:
-    name: EnemyType
-    definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/EnemyType
-    description: 'A hostile AI pilot archetype: which hull it flies, when it engages,
-      and what it drops when destroyed.'
+  RaiderType:
+    name: RaiderType
+    definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/RaiderType
+    description: 'A raider archetype: which hull it flies, when it engages, how close
+      it fights, and what it leaves when destroyed.'
     in_subset:
     - content
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
@@ -1372,20 +1292,26 @@ classes:
     - name
     - description
     - ship_class
-    - fuel_drop
-    - enemyType__detection_range
+    - fuel_yield
+    - raiderType__detection_range
+    - raiderType__keep_distance
     attributes:
       detection_range:
         name: detection_range
-        description: Distance at which the enemy notices and chases a player ship.
+        description: Distance within which the raider notices and chases a pilot ship.
         range: Distance
         required: true
-    class_uri: starflake:EnemyType
+      keep_distance:
+        name: keep_distance
+        description: Distance from its target at which the raider stops closing in.
+        range: Distance
+        required: true
+    class_uri: starflake:RaiderType
   AsteroidType:
     name: AsteroidType
     definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/AsteroidType
     description: A kind of asteroid. Shooting it until its integrity reaches zero
-      breaks it and leaves a fuel loot drop.
+      breaks it and leaves a fuel pod.
     in_subset:
     - content
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
@@ -1395,7 +1321,7 @@ classes:
     - name
     - description
     - AsteroidType_radius
-    - fuel_drop
+    - fuel_yield
     - asteroidType__max_integrity
     slot_usage:
       radius:
@@ -1411,7 +1337,8 @@ classes:
   Galaxy:
     name: Galaxy
     definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/Galaxy
-    description: The map of star systems connected by jump routes.
+    description: Star systems connected by jump routes, and the kinds of ships, weapons,
+      raiders and asteroids found among them.
     in_subset:
     - content
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
@@ -1420,9 +1347,36 @@ classes:
     - id
     - name
     - description
+    - galaxy__weapon_types
+    - galaxy__ship_classes
+    - galaxy__raider_types
+    - galaxy__asteroid_types
     - galaxy__star_systems
-    - galaxy__starting_system
     attributes:
+      weapon_types:
+        name: weapon_types
+        description: Weapons that ship classes mount.
+        range: WeaponType
+        multivalued: true
+        inlined_as_list: true
+      ship_classes:
+        name: ship_classes
+        description: Hull designs that pilot and raider ships are built from.
+        range: ShipClass
+        multivalued: true
+        inlined_as_list: true
+      raider_types:
+        name: raider_types
+        description: Raider archetypes that roam the star systems.
+        range: RaiderType
+        multivalued: true
+        inlined_as_list: true
+      asteroid_types:
+        name: asteroid_types
+        description: Asteroid kinds found in the star systems.
+        range: AsteroidType
+        multivalued: true
+        inlined_as_list: true
       star_systems:
         name: star_systems
         description: Every star system of the galaxy.
@@ -1430,18 +1384,13 @@ classes:
         required: true
         multivalued: true
         inlined_as_list: true
-      starting_system:
-        name: starting_system
-        description: Where new player ships spawn.
-        range: StarSystem
-        required: true
-        inlined: false
     class_uri: starflake:Galaxy
+    tree_root: true
   StarSystem:
     name: StarSystem
     definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/StarSystem
-    description: One playable area around a star. A player ship can jump to any system
-      in jump_targets once it carries at least jump_fuel_cost fuel.
+    description: The space around one star. A pilot ship can jump to any system in
+      jump_targets once it carries at least jump_fuel_cost fuel.
     in_subset:
     - content
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
@@ -1455,7 +1404,7 @@ classes:
     - starSystem__jump_fuel_cost
     - starSystem__jump_targets
     - starSystem__asteroid_fields
-    - starSystem__enemy_groups
+    - starSystem__raider_packs
     attributes:
       star_class:
         name: star_class
@@ -1464,7 +1413,7 @@ classes:
         required: true
       bounds_radius:
         name: bounds_radius
-        description: Radius of the playable sphere centred on the star.
+        description: Radius of the navigable sphere centred on the star.
         range: Distance
         required: true
       jump_fuel_cost:
@@ -1480,34 +1429,33 @@ classes:
         inlined: false
       asteroid_fields:
         name: asteroid_fields
-        description: Asteroid spawn regions in this system.
+        description: Asteroid fields of this system.
         range: AsteroidField
         multivalued: true
         inlined_as_list: true
-      enemy_groups:
-        name: enemy_groups
-        description: Enemy spawn regions in this system.
-        range: EnemyGroup
+      raider_packs:
+        name: raider_packs
+        description: Raider packs of this system.
+        range: RaiderPack
         multivalued: true
         inlined_as_list: true
     class_uri: starflake:StarSystem
-  SpawnRegion:
-    name: SpawnRegion
-    definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/SpawnRegion
-    description: A sphere inside a star system where a number of entities spawn when
-      the system state is first created.
+  Region:
+    name: Region
+    definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/Region
+    description: A sphere inside a star system that holds a number of bodies.
     in_subset:
     - content
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
     abstract: true
     slots:
-    - SpawnRegion_radius
-    - spawnRegion__center
-    - spawnRegion__spawn_count
+    - Region_radius
+    - region__center
+    - region__count
     slot_usage:
       radius:
         name: radius
-        description: Radius of the spawn sphere.
+        description: Radius of the region.
     attributes:
       center:
         name: center
@@ -1515,13 +1463,13 @@ classes:
         range: Vector3D
         required: true
         inlined: true
-      spawn_count:
-        name: spawn_count
-        description: Number of entities spawned in the region.
+      count:
+        name: count
+        description: Number of bodies the region holds.
         range: integer
         required: true
         minimum_value: 1
-    class_uri: starflake:SpawnRegion
+    class_uri: starflake:Region
   AsteroidField:
     name: AsteroidField
     definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/AsteroidField
@@ -1529,115 +1477,73 @@ classes:
     in_subset:
     - content
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
-    is_a: SpawnRegion
+    is_a: Region
     slots:
-    - SpawnRegion_radius
-    - spawnRegion__center
-    - spawnRegion__spawn_count
+    - Region_radius
+    - region__center
+    - region__count
     - asteroid_type
     class_uri: starflake:AsteroidField
-  EnemyGroup:
-    name: EnemyGroup
-    definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/EnemyGroup
-    description: A region where enemies of one type spawn.
+  RaiderPack:
+    name: RaiderPack
+    definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/RaiderPack
+    description: A region that raiders of one type hold.
     in_subset:
     - content
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
-    is_a: SpawnRegion
+    is_a: Region
     slots:
-    - SpawnRegion_radius
-    - spawnRegion__center
-    - spawnRegion__spawn_count
-    - enemy_type
-    class_uri: starflake:EnemyGroup
-  GameSession:
-    name: GameSession
-    definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/GameSession
-    description: 'The persisted state of one play session: a save file in solo, the
-      authoritative world on a host or dedicated server in multiplayer.'
+    - Region_radius
+    - region__center
+    - region__count
+    - raider_type
+    class_uri: starflake:RaiderPack
+  GalaxyState:
+    name: GalaxyState
+    definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/GalaxyState
+    description: 'What is where in a galaxy at one moment: its pilots, their ships,
+      and the state of the star systems visited so far.'
     in_subset:
     - state
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
     slots:
     - id
-    - gameSession__content_pack
-    - gameSession__hosting_mode
-    - gameSession__host
-    - gameSession__max_players
-    - gameSession__players
-    - gameSession__player_ships
-    - gameSession__system_states
+    - galaxyState__galaxy
+    - galaxyState__pilots
+    - galaxyState__pilot_ships
+    - galaxyState__system_states
     attributes:
-      content_pack:
-        name: content_pack
-        description: The content this session was created with.
-        range: ContentPack
+      galaxy:
+        name: galaxy
+        description: The galaxy this is the state of.
+        range: Galaxy
         required: true
         inlined: false
-      hosting_mode:
-        name: hosting_mode
-        description: Who runs the authoritative simulation.
-        range: HostingMode
-        required: true
-      host:
-        name: host
-        description: The player hosting the session. Absent on a dedicated server.
-        range: Player
-        inlined: false
-      max_players:
-        name: max_players
-        description: Maximum number of players allowed at once.
-        range: integer
-        required: true
-        minimum_value: 1
-      players:
-        name: players
-        description: Everyone who has joined the session.
-        range: Player
+      pilots:
+        name: pilots
+        description: Everyone who flies a ship in the galaxy.
+        range: Pilot
         required: true
         multivalued: true
         inlined_as_list: true
-      player_ships:
-        name: player_ships
-        description: The ship of each player.
-        range: PlayerShip
+      pilot_ships:
+        name: pilot_ships
+        description: The ship of each pilot.
+        range: PilotShip
         multivalued: true
         inlined_as_list: true
       system_states:
         name: system_states
         description: State of the systems visited so far. A system without state has
-          not been generated yet.
+          not been visited yet.
         range: StarSystemState
         multivalued: true
         inlined_as_list: true
-    class_uri: starflake:GameSession
-    rules:
-    - preconditions:
-        slot_conditions:
-          hosting_mode:
-            name: hosting_mode
-            equals_string: solo
-      postconditions:
-        slot_conditions:
-          max_players:
-            name: max_players
-            equals_number: 1
-      description: Solo sessions hold exactly one player.
-    - preconditions:
-        slot_conditions:
-          hosting_mode:
-            name: hosting_mode
-            equals_string: dedicated_server
-      postconditions:
-        slot_conditions:
-          host:
-            name: host
-            value_presence: ABSENT
-      description: No player hosts a session that runs on a dedicated server.
-  Player:
-    name: Player
-    definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/Player
-    description: A person taking part in a session. Its name is shown to other players.
+    class_uri: starflake:GalaxyState
+  Pilot:
+    name: Pilot
+    definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/Pilot
+    description: A person who flies a ship. Other pilots know them by name.
     in_subset:
     - state
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
@@ -1646,20 +1552,20 @@ classes:
     - id
     - name
     - description
-    class_uri: starflake:Player
+    class_uri: starflake:Pilot
   StarSystemState:
     name: StarSystemState
     definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/StarSystemState
-    description: 'The world state of one star system within a session: what remains
-      of its asteroids and enemies, and the loot floating there.'
+    description: 'The state of one star system: what remains of its asteroids and
+      raiders, and the fuel pods floating there.'
     in_subset:
     - state
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
     slots:
     - starSystemState__star_system
     - starSystemState__asteroids
-    - starSystemState__enemy_ships
-    - starSystemState__loot_drops
+    - starSystemState__raider_ships
+    - starSystemState__fuel_pods
     attributes:
       star_system:
         name: star_system
@@ -1673,24 +1579,23 @@ classes:
         range: Asteroid
         multivalued: true
         inlined_as_list: true
-      enemy_ships:
-        name: enemy_ships
-        description: Enemy ships not destroyed yet.
-        range: EnemyShip
+      raider_ships:
+        name: raider_ships
+        description: Raider ships not destroyed yet.
+        range: RaiderShip
         multivalued: true
         inlined_as_list: true
-      loot_drops:
-        name: loot_drops
-        description: Fuel not collected yet.
-        range: LootDrop
+      fuel_pods:
+        name: fuel_pods
+        description: Fuel pods not scooped up yet.
+        range: FuelPod
         multivalued: true
         inlined_as_list: true
     class_uri: starflake:StarSystemState
   SpaceEntity:
     name: SpaceEntity
     definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/SpaceEntity
-    description: Anything with a physical presence in a star system. The identifier
-      doubles as the network id in multiplayer.
+    description: Anything with a physical presence in a star system.
     in_subset:
     - state
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
@@ -1740,10 +1645,10 @@ classes:
         range: Amount
         required: true
     class_uri: starflake:Ship
-  PlayerShip:
-    name: PlayerShip
-    definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/PlayerShip
-    description: A ship flown by a player.
+  PilotShip:
+    name: PilotShip
+    definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/PilotShip
+    description: A ship flown by a pilot.
     in_subset:
     - state
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
@@ -1755,14 +1660,14 @@ classes:
     - spaceEntity__orientation
     - ship__hull
     - ship_class
-    - playerShip__pilot
-    - playerShip__current_system
-    - playerShip__fuel
+    - pilotShip__pilot
+    - pilotShip__current_system
+    - pilotShip__fuel
     attributes:
       pilot:
         name: pilot
-        description: The player flying the ship.
-        range: Player
+        description: The pilot flying the ship.
+        range: Pilot
         required: true
         inlined: false
       current_system:
@@ -1776,11 +1681,11 @@ classes:
         description: Fuel in the tank, at most the ship class fuel_capacity.
         range: Amount
         required: true
-    class_uri: starflake:PlayerShip
-  EnemyShip:
-    name: EnemyShip
-    definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/EnemyShip
-    description: A hostile AI ship. Its hull design comes from its enemy type.
+    class_uri: starflake:PilotShip
+  RaiderShip:
+    name: RaiderShip
+    definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/RaiderShip
+    description: A hostile ship. Its hull design comes from its raider type.
     in_subset:
     - state
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
@@ -1791,12 +1696,12 @@ classes:
     - spaceEntity__velocity
     - spaceEntity__orientation
     - ship__hull
-    - enemy_type
-    class_uri: starflake:EnemyShip
+    - raider_type
+    class_uri: starflake:RaiderShip
   Asteroid:
     name: Asteroid
     definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/Asteroid
-    description: An asteroid that breaks into a fuel loot drop when shot enough.
+    description: An asteroid that breaks into a fuel pod when shot enough.
     in_subset:
     - state
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
@@ -1815,10 +1720,11 @@ classes:
         range: Amount
         required: true
     class_uri: starflake:Asteroid
-  LootDrop:
-    name: LootDrop
-    definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/LootDrop
-    description: Fuel floating in space, collected by flying a player ship into it.
+  FuelPod:
+    name: FuelPod
+    definition_uri: https://w3id.org/M4jor-Tom/starflake-ontology/FuelPod
+    description: Fuel floating in space, scooped up by a pilot ship that flies into
+      it.
     in_subset:
     - state
     from_schema: https://w3id.org/M4jor-Tom/starflake-ontology
@@ -1828,16 +1734,16 @@ classes:
     - spaceEntity__position
     - spaceEntity__velocity
     - spaceEntity__orientation
-    - lootDrop__fuel_amount
+    - fuelPod__fuel_amount
     attributes:
       fuel_amount:
         name: fuel_amount
-        description: Fuel collected by picking up this drop.
+        description: Fuel the pod holds.
         range: Amount
         required: true
-    class_uri: starflake:LootDrop
+    class_uri: starflake:FuelPod
 metamodel_version: 1.12.0
 source_file: starflake_ontology.yaml
-source_file_date: '2026-11-19T16:38:26'
-source_file_size: 16385
+source_file_date: '2026-11-21T12:29:56'
+source_file_size: 14847
 

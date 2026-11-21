@@ -1,14 +1,12 @@
 # Invalid: fuel cannot be negative.
-id: session-bad
-content_pack: core
-hosting_mode: solo
-max_players: 1
-players:
-  - id: player-1
+id: state-bad
+galaxy: milky_way
+pilots:
+  - id: pilot-1
     name: Theta
-player_ships:
+pilot_ships:
   - id: ship-1
-    pilot: player-1
+    pilot: pilot-1
     ship_class: scout
     current_system: sol
     hull: 100

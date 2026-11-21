@@ -1,9 +1,0 @@
-# Invalid: a dedicated server session has no player host.
-id: session-bad
-content_pack: core
-hosting_mode: dedicated_server
-max_players: 8
-host: player-1
-players:
-  - id: player-1
-    name: Theta

@@ -39,6 +39,11 @@ There are several pre-defined command-recipes available.
 They are written for the command runner [just](https://github.com/casey/just/).
 To list all pre-defined commands, run `just` or `just --list`.
 
+## Reporting a problem
+
+Report problems and ideas for any part of Starflake in one place:
+<https://github.com/M4jor-Tom/starflake/issues/new/choose>.
+
 ## Credits
 
 This project uses the template [linkml-project-copier](https://github.com/linkml/linkml-project-copier).

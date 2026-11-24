@@ -6,6 +6,7 @@
 # By default all generators are run. Specify here the ones to skip.
 excludes:
   - markdown
+  - python
 
 # Alternatively only specify the generators to run
 # (comment out the above "excludes" section)
@@ -39,13 +40,6 @@ generator_args:
     mergeimports: true
   jsonldcontext:
     mergeimports: true
-  # gen-pydantic is not yet supported by gen-project.
-  #   https://github.com/linkml/linkml/issues/2537
-  # pydantic:
-  #   mergeimports: true
-  python:
-    mergeimports: true
-    # head: true  # Why does this not work?
   prefixmap:
     mergeimports: true
   proto:

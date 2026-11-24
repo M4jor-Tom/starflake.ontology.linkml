@@ -59,8 +59,6 @@ skip = [
   "pyproject.toml",
   "uv.lock",
   "project/*",
-  "src/starflake_ontology/datamodel/starflake_ontology_pydantic.py",
-  "src/starflake_ontology/datamodel/starflake_ontology.py",
 ]
 
 # Reminder: words have to be lowercased for the ignore-words-list
@@ -77,6 +75,4 @@ extend-exclude = [
   "uv.lock",
   "pyproject.toml",
   "project/*",
-  "src/starflake_ontology/datamodel/starflake_ontology_pydantic.py",
-  "src/starflake_ontology/datamodel/starflake_ontology.py",
 ]

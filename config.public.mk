@@ -23,7 +23,3 @@ LINKML_GENERATORS_DOC_ARGS=
 ##   (i.e. --no-type-objects --no-metaclasses --metadata-profile=rdfs)
 # LINKML_GENERATORS_OWL_ARGS="--no-type-objects --no-metaclasses --metadata-profile=rdfs"
 LINKML_GENERATORS_OWL_ARGS=
-
-## pass args to pydantic generator which isn't supported by gen-project
-## https://github.com/linkml/linkml/issues/2537
-LINKML_GENERATORS_PYDANTIC_ARGS=

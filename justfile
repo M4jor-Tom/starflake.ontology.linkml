@@ -32,13 +32,10 @@ config_yaml := if env_var_or_default("LINKML_GENERATORS_CONFIG_YAML", "") != "" 
 gen_doc_args := env_var_or_default("LINKML_GENERATORS_DOC_ARGS", "")
 gen_java_args := env_var_or_default("LINKML_GENERATORS_JAVA_ARGS", "")
 gen_owl_args := env_var_or_default("LINKML_GENERATORS_OWL_ARGS", "")
-gen_pydantic_args := env_var_or_default("LINKML_GENERATORS_PYDANTIC_ARGS", "")
 gen_ts_args := env_var_or_default("LINKML_GENERATORS_TYPESCRIPT_ARGS", "")
 
 # Directory variables
-src := "src"
 dest := "project"
-pymodel := src / schema_name / "datamodel"
 source_schema_path := source_schema_dir / schema_name + ".yaml"
 docdir := "docs/elements"  # Directory for generated documentation
 distrib_schema_path := "docs/schema"  # Directory for publishing schema artifacts
@@ -129,18 +126,10 @@ gen-doc: _gen-yaml && _add-artifacts
 [group('model development')]
 testdoc: gen-doc _serve
 
-# Generate the Python data models (dataclasses & pydantic)
-gen-python:
-  uv run gen-project -d  {{pymodel}} -I python {{source_schema_path}}
-  uv run gen-pydantic {{gen_pydantic_args}} {{source_schema_path}} > {{pymodel}}/{{schema_name}}_pydantic.py
-
-# Generate project files including Python data model
+# Generate project files
 [group('model development')]
 gen-project:
   uv run gen-project {{config_yaml}} -d {{dest}} {{source_schema_path}}
-  mkdir -p {{pymodel}}
-  mv {{dest}}/*.py {{pymodel}}/
-  uv run gen-pydantic {{gen_pydantic_args}} {{source_schema_path}} > {{pymodel}}/{{schema_name}}_pydantic.py
 
   @# Some generators ignore config_yaml or cannot create directories, so we run them separately.
   uv run gen-java {{gen_java_args}} --output-directory {{dest}}/java/ {{source_schema_path}}
@@ -216,7 +205,7 @@ _test-schema:
   uv run gen-project {{config_yaml}} -d tmp {{source_schema_path}}
 
 # Run Python unit tests with pytest
-_test-python: gen-python
+_test-python:
   uv run python -m pytest
 
 # Run example tests
@@ -267,15 +256,6 @@ _clean_project:
         if d.is_dir():
             print(f'removing "{d}"')
             shutil.rmtree(d, ignore_errors=True)
-    # remove the generated python data model
-    for d in pathlib.Path("{{pymodel}}").iterdir():
-        if d.name == "__init__.py":
-            continue
-        print(f'removing "{d}"')
-        if d.is_dir():
-            shutil.rmtree(d, ignore_errors=True)
-        else:
-            d.unlink()
 
 _ensure_examples_output:  # Ensure a clean examples/output directory exists
   -mkdir -p examples/output

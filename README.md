@@ -42,8 +42,6 @@ Run every command inside `nix develop`, for example `nix develop --command just 
   * [starflake_ontology](src/starflake_ontology)
     * [schema/](src/starflake_ontology/schema) -- LinkML schema
       (edit this)
-    * [datamodel/](src/starflake_ontology/datamodel) -- generated
-      Python datamodel
 * [tests/](tests/) - Python tests
   * [data/](tests/data) - Example data
 

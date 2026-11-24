@@ -1,27 +1,16 @@
-"""Data test."""
+"""Check the YAML fixtures directly against the authored LinkML schema."""
 
-import os
-import glob
-import pytest
 from pathlib import Path
 
-import starflake_ontology.datamodel.starflake_ontology
-from linkml_runtime.loaders import yaml_loader
+import pytest
+from linkml.validator import validate_file
 
-DATA_DIR_VALID = Path(__file__).parent / "data" / "valid"
-DATA_DIR_INVALID = Path(__file__).parent / "data" / "invalid"
-
-VALID_EXAMPLE_FILES = glob.glob(os.path.join(DATA_DIR_VALID, "*.yaml"))
-INVALID_EXAMPLE_FILES = glob.glob(os.path.join(DATA_DIR_INVALID, "*.yaml"))
+DATA = Path(__file__).parent / "data"
+SCHEMA = DATA.parents[1] / "src/starflake_ontology/schema/starflake_ontology.yaml"
 
 
-@pytest.mark.parametrize("filepath", VALID_EXAMPLE_FILES)
-def test_valid_data_files(filepath):
-    """Test loading of all valid data files."""
-    target_class_name = Path(filepath).stem.split("-")[0]
-    tgt_class = getattr(
-        starflake_ontology.datamodel.starflake_ontology,
-        target_class_name,
-    )
-    obj = yaml_loader.load(filepath, target_class=tgt_class)
-    assert obj
+@pytest.mark.parametrize("path", sorted(DATA.glob("*/*.yaml")), ids=lambda path: path.name)
+def test_fixture(path):
+    target_class = path.stem.split("-", 1)[0]
+    report = validate_file(path, str(SCHEMA), target_class)
+    assert bool(report.results) == (path.parent.name == "invalid"), report.results

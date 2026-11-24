@@ -10,6 +10,20 @@ See [docs/ontology-graph.md](docs/ontology-graph.md) (rendered by GitHub), or
 run `just testdoc` for the browsable site. Regenerate it with `just gen-graph`;
 a test fails when it is out of date.
 
+## Where does a Gherkin scenario belong?
+
+Put a [competency question](features/competency_questions.feature) here if its
+answer is a fact you can read or infer from the model and its data without
+running the game. For example, “Which systems are one jump from Sol?” needs
+only the [example galaxy](tests/data/valid/Galaxy-001.yaml). “Which objects can
+be destroyed by melting?” asks about a vulnerability, not whether a particular
+object is destroyed. The current schema does not yet model that vulnerability.
+
+“What happens when the pilot attempts that jump without enough fuel?” belongs in
+[design/features/jump.feature](https://github.com/M4jor-Tom/starflake.design/blob/master/features/jump.feature):
+it specifies what the game does. If a statement only names a field or its type,
+keep it in the LinkML schema instead of restating it in Gherkin.
+
 ## Development on NixOS
 
 Run every command inside `nix develop`, for example `nix develop --command just test`.

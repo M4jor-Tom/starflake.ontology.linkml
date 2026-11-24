@@ -38,7 +38,6 @@ gen_ts_args := env_var_or_default("LINKML_GENERATORS_TYPESCRIPT_ARGS", "")
 dest := "project"
 source_schema_path := source_schema_dir / schema_name + ".yaml"
 docdir := "docs/elements"  # Directory for generated documentation
-distrib_schema_path := "docs/schema"  # Directory for publishing schema artifacts
 
 # ============== Project recipes ==============
 
@@ -117,9 +116,9 @@ test: _test-schema _test-python _test-examples
 lint:
   uv run linkml-lint {{source_schema_dir}}
 
-# Generate md documentation for the schema and add artifacts
+# Generate Markdown documentation from the source schema
 [group('model development')]
-gen-doc: _gen-yaml && _add-artifacts
+gen-doc:
   uv run gen-doc {{gen_doc_args}} -d {{docdir}} {{source_schema_path}}
 
 # Build docs and run test server
@@ -219,14 +218,6 @@ _test-examples: _ensure_examples_output
     --input-directory tests/data/valid \
     --output-directory examples/output \
     --schema {{source_schema_path}} > examples/output/README.md
-
-# Add the merged model to docs/schema.
-_gen-yaml:
-  -mkdir -p {{distrib_schema_path}}
-  uv run gen-yaml {{source_schema_path}} > {{distrib_schema_path}}/{{schema_name}}.yaml
-
-# Overridable recipe to add project-specific artifacts to the distribution schema path
-_add-artifacts:
 
 # Run documentation server
 _serve:

@@ -37,7 +37,7 @@ gen_ts_args := env_var_or_default("LINKML_GENERATORS_TYPESCRIPT_ARGS", "")
 # Directory variables
 dest := "project"
 source_schema_path := source_schema_dir / schema_name + ".yaml"
-docdir := "docs/elements"  # Directory for generated documentation
+docdir := "docs/generated/elements"  # Directory for generated documentation
 
 # ============== Project recipes ==============
 
@@ -149,7 +149,7 @@ gen-project:
 # created with linkml-project-copier v0.1.x to v0.2.0 or newer.
 # Use with care! - It may not work for customized projects.
 _post_upgrade_v020: _wsl2_compat_check && _post_upgrade_v020py
-  mv docs/*.md docs/elements
+  mv docs/*.md {{docdir}}
 
 _post_upgrade_v020py:
     #!{{shebang}}

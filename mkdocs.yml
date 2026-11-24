@@ -62,7 +62,7 @@ watch:
 nav:
   - Home: index.md
   - Ontology graph: generated/ontology-graph.md
-  - Schema: elements/index.md
+  - Schema: generated/elements/index.md
   - About: about.md
 
 exclude_docs: |

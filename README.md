@@ -35,7 +35,7 @@ Run every command inside `nix develop`, for example `nix develop --command just 
 ## Repository Structure
 
 * [docs/](docs/) - mkdocs-managed documentation
-  * [elements/](docs/elements/) - generated schema documentation
+  * [generated/elements/](docs/generated/elements/) - generated schema documentation
 * [examples/](examples/) - Examples of using the schema
 * [project/](project/) - project files (these files are auto-generated, do not edit)
 * [src/](src/) - source files (edit these)

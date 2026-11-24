@@ -7,4 +7,5 @@
 # Render the ontology as Mermaid class diagrams, one per subset
 [group('model development')]
 gen-graph:
-  uv run python -m starflake_ontology.graph {{source_schema_path}} > docs/ontology-graph.md
+  mkdir -p docs/generated
+  uv run python -m starflake_ontology.graph {{source_schema_path}} > docs/generated/ontology-graph.md

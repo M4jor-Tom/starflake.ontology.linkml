@@ -6,7 +6,7 @@ Domain ontology for the Starflake space exploration game
 
 ## Ontology graph
 
-See [docs/ontology-graph.md](docs/ontology-graph.md) (rendered by GitHub), or
+See the [ontology graph](docs/generated/ontology-graph.md) (rendered by GitHub), or
 run `just testdoc` for the browsable site. Regenerate it with `just gen-graph`;
 a test fails when it is out of date.
 

@@ -1,6 +1,6 @@
 """Render the schema as Mermaid class diagrams, one per subset.
 
-Usage: python -m starflake_ontology.graph SCHEMA > docs/ontology-graph.md
+Regenerate the Markdown file with: just gen-graph
 """
 
 import sys

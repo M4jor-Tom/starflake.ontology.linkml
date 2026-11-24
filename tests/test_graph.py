@@ -9,5 +9,5 @@ SCHEMA = ROOT / "src/starflake_ontology/schema/starflake_ontology.yaml"
 
 
 def test_graph_is_up_to_date():
-    committed = (ROOT / "docs/ontology-graph.md").read_text()
+    committed = (ROOT / "docs/generated/ontology-graph.md").read_text()
     assert committed == render(str(SCHEMA)), "run `just gen-graph`"

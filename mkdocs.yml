@@ -61,7 +61,7 @@ watch:
 
 nav:
   - Home: index.md
-  - Ontology graph: ontology-graph.md
+  - Ontology graph: generated/ontology-graph.md
   - Schema: elements/index.md
   - About: about.md
 

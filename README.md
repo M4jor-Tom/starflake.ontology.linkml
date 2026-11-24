@@ -15,9 +15,16 @@ a test fails when it is out of date.
 Put a [competency question](features/competency_questions.feature) here if its
 answer is a fact you can read or infer from the model and its data without
 running the game. For example, “Which systems are one jump from Sol?” needs
-only the [example galaxy](tests/data/valid/Galaxy-001.yaml). “Which objects can
-be destroyed by melting?” asks about a vulnerability, not whether a particular
-object is destroyed. The current schema does not yet model that vulnerability.
+only the [example galaxy](tests/data/valid/Galaxy-001.yaml). It also records
+Sol's luminosity, the reference melting points of pure iron and water ice at one
+atmosphere, and water ice as a structural material of an ice rock.
+
+For a uniformly heated blackbody sphere, the reference melting radius
+is `r = sqrt(L / (16 π σ)) / T²`, measured from the star's centre. `L` is the
+stellar luminosity in watts, `T` the melting point in kelvin, and `σ` the
+Stefan–Boltzmann constant. The result in metres is unknown if either input is
+missing. Reaching that temperature does not establish that exposed ice becomes
+liquid in vacuum or that an object is destroyed.
 
 “What happens when the pilot attempts that jump without enough fuel?” belongs in
 [design/features/jump.feature](https://github.com/M4jor-Tom/starflake.design/blob/master/features/jump.feature):

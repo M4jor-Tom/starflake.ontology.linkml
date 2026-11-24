@@ -1,6 +1,13 @@
 # A small galaxy: two systems in a line, one weapon, two hulls.
 id: milky_way
 name: Milky Way
+materials:
+  - id: iron
+    name: pure iron
+    reference_melting_point: 1811
+  - id: water_ice
+    name: water ice
+    reference_melting_point: 273.15
 weapon_types:
   - id: pulse_laser
     name: Pulse laser
@@ -41,12 +48,14 @@ raider_types:
 asteroid_types:
   - id: ice_rock
     name: Ice rock
+    structural_materials: [water_ice]
     radius: 20
     max_integrity: 50
     fuel_yield: 10
 star_systems:
   - id: sol
     name: Sol
+    stellar_luminosity: 3.828e+26
     star_class: g
     bounds_radius: 10000
     jump_fuel_cost: 60

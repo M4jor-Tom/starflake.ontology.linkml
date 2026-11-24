@@ -37,6 +37,9 @@ What exists in a galaxy, rooted at Galaxy.
 
 ```mermaid
 classDiagram
+class SolidMaterial {
+  +double reference_melting_point [0..1]
+}
 class WeaponType {
   +Amount damage [1]
   +Amount fire_rate [1]
@@ -66,6 +69,7 @@ class AsteroidType {
 class Galaxy {
 }
 class StarSystem {
+  +double stellar_luminosity [0..1]
   +Distance bounds_radius [1]
   +Amount jump_fuel_cost [1]
 }
@@ -88,13 +92,17 @@ class SpectralClass {
   k
   m
 }
+NamedThing <|-- SolidMaterial
 NamedThing <|-- WeaponType
 NamedThing <|-- ShipClass
+ShipClass --> "*" SolidMaterial : structural_materials
 ShipClass --> "*" WeaponType : weapons
 NamedThing <|-- RaiderType
 RaiderType --> "1" ShipClass : ship_class
 NamedThing <|-- AsteroidType
+AsteroidType --> "*" SolidMaterial : structural_materials
 NamedThing <|-- Galaxy
+Galaxy *-- "*" SolidMaterial : materials
 Galaxy *-- "*" WeaponType : weapon_types
 Galaxy *-- "*" ShipClass : ship_classes
 Galaxy *-- "*" RaiderType : raider_types

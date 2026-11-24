@@ -98,6 +98,22 @@ classes:
 
   # ------------------------------------------------------------ content
 
+  SolidMaterial:
+    in_subset: [content]
+    is_a: NamedThing
+    description: A substance from which a solid body can be made.
+    attributes:
+      reference_melting_point:
+        description: >-
+          Temperature at which the pure solid begins to melt at one atmosphere.
+          Omitted if unknown or if there is no liquid phase at that pressure.
+        range: double
+        unit:
+          ucum_code: K
+        minimum_value: 0
+        none_of:
+          - equals_number: 0
+
   WeaponType:
     in_subset: [content]
     is_a: NamedThing
@@ -126,6 +142,7 @@ classes:
     in_subset: [content]
     is_a: NamedThing
     description: A hull design that pilot and raider ships are built from.
+    slots: [structural_materials]
     attributes:
       max_hull:
         description: Hull points of an undamaged ship.
@@ -199,6 +216,7 @@ classes:
     slots:
       - radius
       - fuel_yield
+      - structural_materials
     slot_usage:
       radius:
         description: Collision radius of the asteroid.
@@ -216,6 +234,11 @@ classes:
       Star systems connected by jump routes, and the kinds of ships, weapons,
       raiders and asteroids found among them.
     attributes:
+      materials:
+        description: Known solid materials found in this galaxy.
+        range: SolidMaterial
+        multivalued: true
+        inlined_as_list: true
       weapon_types:
         description: Weapons that ship classes mount.
         range: WeaponType
@@ -250,6 +273,14 @@ classes:
       The space around one star. A pilot ship can jump to any system in
       jump_targets once it carries at least jump_fuel_cost fuel.
     attributes:
+      stellar_luminosity:
+        description: Total power radiated by the central star, if known.
+        range: double
+        unit:
+          ucum_code: W
+        minimum_value: 0
+        none_of:
+          - equals_number: 0
       star_class:
         description: Spectral class of the star, driving its look.
         range: SpectralClass
@@ -464,6 +495,13 @@ classes:
         required: true
 
 slots:
+  structural_materials:
+    description: >-
+      Materials on which the body depends for its structure. If they melt,
+      the body can lose its integrity; their presence does not imply destruction.
+    range: SolidMaterial
+    multivalued: true
+    inlined: false
   id:
     identifier: true
     slot_uri: schema:identifier

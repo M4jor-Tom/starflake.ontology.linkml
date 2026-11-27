@@ -1,0 +1,51 @@
+---
+id: https://w3id.org/M4jor-Tom/starflake-ontology/schema/galaxy/regions
+name: starflake-galaxy-regions
+title: Starflake regions
+description: Asteroid fields and raider packs within star systems.
+license: Apache-2.0
+
+prefixes:
+  starflake: https://w3id.org/M4jor-Tom/starflake-ontology/
+default_prefix: starflake
+default_range: string
+
+imports:
+  - ../catalog/encounters
+  - ../core/geometry
+
+classes:
+  Region:
+    in_subset: [content]
+    abstract: true
+    description: A sphere inside a star system that holds a number of bodies.
+    slots:
+      - radius
+    slot_usage:
+      radius:
+        description: Radius of the region.
+    attributes:
+      center:
+        description: Centre of the region, relative to the star.
+        range: Vector3D
+        required: true
+        inlined: true
+      count:
+        description: Number of bodies the region holds.
+        range: integer
+        required: true
+        minimum_value: 1
+
+  AsteroidField:
+    in_subset: [content]
+    is_a: Region
+    description: A region filled with asteroids of one type.
+    slots:
+      - asteroid_type
+
+  RaiderPack:
+    in_subset: [content]
+    is_a: Region
+    description: A region that raiders of one type hold.
+    slots:
+      - raider_type

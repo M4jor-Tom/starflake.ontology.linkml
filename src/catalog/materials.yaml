@@ -1,0 +1,40 @@
+---
+id: https://w3id.org/M4jor-Tom/starflake-ontology/schema/catalog/materials
+name: starflake-catalog-materials
+title: Starflake materials
+description: Solid materials and their use in hulls and asteroids.
+license: Apache-2.0
+
+prefixes:
+  starflake: https://w3id.org/M4jor-Tom/starflake-ontology/
+default_prefix: starflake
+default_range: string
+
+imports:
+  - ../core/identity
+
+classes:
+  SolidMaterial:
+    in_subset: [content]
+    is_a: NamedThing
+    description: A substance from which a solid body can be made.
+    attributes:
+      reference_melting_point:
+        description: >-
+          Temperature at which the pure solid begins to melt at one atmosphere.
+          Omitted if unknown or if there is no liquid phase at that pressure.
+        range: double
+        unit:
+          ucum_code: K
+        minimum_value: 0
+        none_of:
+          - equals_number: 0
+
+slots:
+  structural_materials:
+    description: >-
+      Materials on which the body depends for its structure. If they melt,
+      the body can lose its integrity; their presence does not imply destruction.
+    range: SolidMaterial
+    multivalued: true
+    inlined: false

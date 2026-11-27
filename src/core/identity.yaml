@@ -1,0 +1,49 @@
+---
+id: https://w3id.org/M4jor-Tom/starflake-ontology/schema/core/identity
+name: starflake-core-identity
+title: Starflake identity
+description: Identifiers, names and shared schema subsets.
+license: Apache-2.0
+
+prefixes:
+  starflake: https://w3id.org/M4jor-Tom/starflake-ontology/
+  linkml: https://w3id.org/linkml/
+  schema: http://schema.org/
+default_prefix: starflake
+default_range: string
+
+imports:
+  - linkml:types
+
+subsets:
+  core:
+    description: Building blocks shared by content and state.
+  content:
+    description: What exists in a galaxy, rooted at Galaxy.
+  state:
+    description: What is where at one moment, rooted at GalaxyState.
+
+classes:
+  NamedThing:
+    in_subset: [core]
+    abstract: true
+    description: Anything identifiable and named, whether content or state.
+    slots:
+      - id
+      - name
+      - description
+    class_uri: schema:Thing
+
+slots:
+  id:
+    identifier: true
+    slot_uri: schema:identifier
+    range: string
+    description: A unique identifier.
+  name:
+    slot_uri: schema:name
+    required: true
+    description: A human-readable name.
+  description:
+    slot_uri: schema:description
+    description: A human-readable description.

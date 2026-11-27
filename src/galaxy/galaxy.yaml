@@ -1,0 +1,55 @@
+---
+id: https://w3id.org/M4jor-Tom/starflake-ontology/schema/galaxy/galaxy
+name: starflake-galaxy-galaxy
+title: Starflake galaxy
+description: The galaxy content root and its catalogs.
+license: Apache-2.0
+
+prefixes:
+  starflake: https://w3id.org/M4jor-Tom/starflake-ontology/
+default_prefix: starflake
+default_range: string
+
+imports:
+  - ./star_systems
+
+classes:
+  Galaxy:
+    in_subset: [content]
+    tree_root: true
+    is_a: NamedThing
+    description: >-
+      Star systems connected by jump routes, and the kinds of ships, weapons,
+      raiders and asteroids found among them.
+    attributes:
+      materials:
+        description: Known solid materials found in this galaxy.
+        range: SolidMaterial
+        multivalued: true
+        inlined_as_list: true
+      weapon_types:
+        description: Weapons that ship classes mount.
+        range: WeaponType
+        multivalued: true
+        inlined_as_list: true
+      ship_classes:
+        description: Hull designs that pilot and raider ships are built from.
+        range: ShipClass
+        multivalued: true
+        inlined_as_list: true
+      raider_types:
+        description: Raider archetypes that roam the star systems.
+        range: RaiderType
+        multivalued: true
+        inlined_as_list: true
+      asteroid_types:
+        description: Asteroid kinds found in the star systems.
+        range: AsteroidType
+        multivalued: true
+        inlined_as_list: true
+      star_systems:
+        description: Every star system of the galaxy.
+        range: StarSystem
+        multivalued: true
+        required: true
+        inlined_as_list: true

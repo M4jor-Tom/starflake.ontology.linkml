@@ -1,0 +1,69 @@
+---
+id: https://w3id.org/M4jor-Tom/starflake-ontology/schema/catalog/encounters
+name: starflake-catalog-encounters
+title: Starflake encounters
+description: Raider and asteroid archetypes and their fuel yields.
+license: Apache-2.0
+
+prefixes:
+  starflake: https://w3id.org/M4jor-Tom/starflake-ontology/
+default_prefix: starflake
+default_range: string
+
+imports:
+  - ./ships
+
+classes:
+  RaiderType:
+    in_subset: [content]
+    is_a: NamedThing
+    description: >-
+      A raider archetype: which hull it flies, when it engages, how close it
+      fights, and what it leaves when destroyed.
+    slots:
+      - ship_class
+      - fuel_yield
+    attributes:
+      detection_range:
+        description: Distance within which the raider notices and chases a pilot ship.
+        range: Distance
+        required: true
+      keep_distance:
+        description: Distance from its target at which the raider stops closing in.
+        range: Distance
+        required: true
+
+  AsteroidType:
+    in_subset: [content]
+    is_a: NamedThing
+    description: >-
+      A kind of asteroid. Shooting it until its integrity reaches zero breaks
+      it and leaves a fuel pod.
+    slots:
+      - radius
+      - fuel_yield
+      - structural_materials
+    slot_usage:
+      radius:
+        description: Collision radius of the asteroid.
+    attributes:
+      max_integrity:
+        description: Damage needed to break the asteroid.
+        range: Amount
+        required: true
+
+slots:
+  fuel_yield:
+    description: Fuel in the pod left when this is destroyed.
+    range: Amount
+    required: true
+  raider_type:
+    description: The raider archetype.
+    range: RaiderType
+    required: true
+    inlined: false
+  asteroid_type:
+    description: The kind of asteroid.
+    range: AsteroidType
+    required: true
+    inlined: false

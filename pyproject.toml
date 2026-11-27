@@ -29,7 +29,7 @@ dev = [
 ]
 
 [tool.hatch.build.targets.wheel]
-only-include = ["src/starflake_ontology.yaml"]
+include = ["/src/**/*.yaml"]
 sources = ["src"]
 
 [tool.hatch.version]

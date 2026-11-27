@@ -1,0 +1,45 @@
+---
+id: https://w3id.org/M4jor-Tom/starflake-ontology/schema/core/quantities
+name: starflake-core-quantities
+title: Starflake quantities
+description: Non-negative amounts, distances and speeds.
+license: Apache-2.0
+
+prefixes:
+  starflake: https://w3id.org/M4jor-Tom/starflake-ontology/
+  linkml: https://w3id.org/linkml/
+default_prefix: starflake
+default_range: string
+
+imports:
+  - linkml:types
+
+types:
+  Amount:
+    typeof: float
+    uri: xsd:float
+    base: float
+    minimum_value: 0
+    description: A non-negative quantity such as hull points, damage or fuel.
+  Distance:
+    typeof: float
+    uri: xsd:float
+    base: float
+    minimum_value: 0
+    unit:
+      ucum_code: m
+    description: A non-negative length in metres.
+  Speed:
+    typeof: float
+    uri: xsd:float
+    base: float
+    minimum_value: 0
+    unit:
+      ucum_code: m/s
+    description: A non-negative speed in metres per second.
+
+slots:
+  radius:
+    description: Radius of a sphere.
+    range: Distance
+    required: true

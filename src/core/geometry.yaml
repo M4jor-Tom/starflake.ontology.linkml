@@ -1,0 +1,48 @@
+---
+id: https://w3id.org/M4jor-Tom/starflake-ontology/schema/core/geometry
+name: starflake-core-geometry
+title: Starflake geometry
+description: Position, velocity and orientation in three dimensions.
+license: Apache-2.0
+
+prefixes:
+  starflake: https://w3id.org/M4jor-Tom/starflake-ontology/
+default_prefix: starflake
+default_range: string
+
+imports:
+  - ./identity
+
+classes:
+  Vector3D:
+    in_subset: [core]
+    description: >-
+      A 3D vector in metres (position) or metres per second (velocity).
+      Named Vector3D so it does not shadow the engine's own Vector3.
+    slots: [x, y, z]
+
+  Attitude:
+    in_subset: [core]
+    description: >-
+      The rotation of a body in 3D space, stored as a unit quaternion.
+      Named Attitude (the aerospace term) so it does not clash with the
+      engine's Quaternion type or Godot's Orientation enum.
+    slots: [x, y, z, w]
+
+slots:
+  x:
+    description: X component.
+    range: float
+    required: true
+  y:
+    description: Y component.
+    range: float
+    required: true
+  z:
+    description: Z component.
+    range: float
+    required: true
+  w:
+    description: W (scalar) component.
+    range: float
+    required: true

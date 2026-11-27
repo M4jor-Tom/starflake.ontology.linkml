@@ -1,0 +1,60 @@
+---
+id: https://w3id.org/M4jor-Tom/starflake-ontology/schema/state/entities
+name: starflake-state-entities
+title: Starflake entities
+description: Physical entities, asteroids and collectible fuel pods.
+license: Apache-2.0
+
+prefixes:
+  starflake: https://w3id.org/M4jor-Tom/starflake-ontology/
+default_prefix: starflake
+default_range: string
+
+imports:
+  - ../core/geometry
+  - ../catalog/encounters
+
+classes:
+  SpaceEntity:
+    in_subset: [state]
+    abstract: true
+    description: >-
+      Anything with a physical presence in a star system.
+    slots:
+      - id
+    attributes:
+      position:
+        description: Position relative to the star of the current system.
+        range: Vector3D
+        required: true
+        inlined: true
+      velocity:
+        description: Linear velocity.
+        range: Vector3D
+        inlined: true
+      orientation:
+        description: Facing of the entity.
+        range: Attitude
+        inlined: true
+
+  Asteroid:
+    in_subset: [state]
+    is_a: SpaceEntity
+    description: An asteroid that breaks into a fuel pod when shot enough.
+    slots:
+      - asteroid_type
+    attributes:
+      integrity:
+        description: Remaining integrity. The asteroid breaks at zero.
+        range: Amount
+        required: true
+
+  FuelPod:
+    in_subset: [state]
+    is_a: SpaceEntity
+    description: Fuel floating in space, scooped up by a pilot ship that flies into it.
+    attributes:
+      fuel_amount:
+        description: Fuel the pod holds.
+        range: Amount
+        required: true

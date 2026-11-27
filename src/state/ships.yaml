@@ -1,0 +1,61 @@
+---
+id: https://w3id.org/M4jor-Tom/starflake-ontology/schema/state/ships
+name: starflake-state-ships
+title: Starflake ships
+description: Pilots and the current state of pilot and raider ships.
+license: Apache-2.0
+
+prefixes:
+  starflake: https://w3id.org/M4jor-Tom/starflake-ontology/
+default_prefix: starflake
+default_range: string
+
+imports:
+  - ./entities
+  - ../galaxy/star_systems
+
+classes:
+  Pilot:
+    in_subset: [state]
+    is_a: NamedThing
+    description: A person who flies a ship. Other pilots know them by name.
+
+  Ship:
+    in_subset: [state]
+    abstract: true
+    is_a: SpaceEntity
+    description: A flying, armed entity that can be destroyed.
+    attributes:
+      hull:
+        description: Remaining hull points. The ship is destroyed at zero.
+        range: Amount
+        required: true
+
+  PilotShip:
+    in_subset: [state]
+    is_a: Ship
+    description: A ship flown by a pilot.
+    slots:
+      - ship_class
+    attributes:
+      pilot:
+        description: The pilot flying the ship.
+        range: Pilot
+        required: true
+        inlined: false
+      current_system:
+        description: The star system the ship is in.
+        range: StarSystem
+        required: true
+        inlined: false
+      fuel:
+        description: Fuel in the tank, at most the ship class fuel_capacity.
+        range: Amount
+        required: true
+
+  RaiderShip:
+    in_subset: [state]
+    is_a: Ship
+    description: A hostile ship. Its hull design comes from its raider type.
+    slots:
+      - raider_type

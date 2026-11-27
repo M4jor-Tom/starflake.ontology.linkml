@@ -1,0 +1,97 @@
+---
+id: https://w3id.org/M4jor-Tom/starflake-ontology/schema/catalog/ships
+name: starflake-catalog-ships
+title: Starflake ships
+description: Ship hull designs and the weapons they mount.
+license: Apache-2.0
+
+prefixes:
+  starflake: https://w3id.org/M4jor-Tom/starflake-ontology/
+default_prefix: starflake
+default_range: string
+
+imports:
+  - ./materials
+  - ../core/quantities
+
+classes:
+  WeaponType:
+    in_subset: [content]
+    is_a: NamedThing
+    description: A ship-mounted weapon that fires projectiles.
+    attributes:
+      damage:
+        description: Hull or integrity points removed per hit.
+        range: Amount
+        required: true
+      fire_rate:
+        description: Shots per second.
+        range: Amount
+        required: true
+        unit:
+          ucum_code: /s
+      projectile_speed:
+        description: Speed of a fired projectile.
+        range: Speed
+        required: true
+      max_range:
+        description: Distance after which a projectile dissipates.
+        range: Distance
+        required: true
+
+  ShipClass:
+    in_subset: [content]
+    is_a: NamedThing
+    description: A hull design that pilot and raider ships are built from.
+    slots: [structural_materials]
+    attributes:
+      max_hull:
+        description: Hull points of an undamaged ship.
+        range: Amount
+        required: true
+      max_speed:
+        description: Top linear speed.
+        range: Speed
+        required: true
+      acceleration:
+        description: Linear acceleration under full thrust.
+        range: Amount
+        required: true
+        unit:
+          ucum_code: m/s2
+      turn_rate:
+        description: Maximum angular speed.
+        range: Amount
+        required: true
+        unit:
+          ucum_code: rad/s
+      fuel_capacity:
+        description: Maximum fuel the tank holds. Zero for ships that never jump.
+        range: Amount
+        required: true
+      scoop_radius:
+        description: >-
+          Distance within which the fuel scoop takes in a fuel pod. Zero for
+          ships without a scoop.
+        range: Distance
+        required: true
+      tractor_range:
+        description: Distance within which the ship pulls fuel pods toward itself.
+        range: Distance
+        required: true
+      tractor_speed:
+        description: Speed at which a pulled fuel pod moves toward the ship.
+        range: Speed
+        required: true
+      weapons:
+        description: Weapons mounted on every ship of this class.
+        range: WeaponType
+        multivalued: true
+        inlined: false
+
+slots:
+  ship_class:
+    description: The hull design.
+    range: ShipClass
+    required: true
+    inlined: false

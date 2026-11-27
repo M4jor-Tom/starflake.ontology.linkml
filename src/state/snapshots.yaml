@@ -1,0 +1,75 @@
+---
+id: https://w3id.org/M4jor-Tom/starflake-ontology/schema/state/snapshots
+name: starflake-state-snapshots
+title: Starflake snapshots
+description: Galaxy and star system state at a moment in time.
+license: Apache-2.0
+
+prefixes:
+  starflake: https://w3id.org/M4jor-Tom/starflake-ontology/
+default_prefix: starflake
+default_range: string
+
+imports:
+  - ../galaxy/galaxy
+  - ./ships
+
+classes:
+  GalaxyState:
+    in_subset: [state]
+    description: >-
+      What is where in a galaxy at one moment: its pilots, their ships, and
+      the state of the star systems visited so far.
+    slots:
+      - id
+    attributes:
+      galaxy:
+        description: The galaxy this is the state of.
+        range: Galaxy
+        required: true
+        inlined: false
+      pilots:
+        description: Everyone who flies a ship in the galaxy.
+        range: Pilot
+        multivalued: true
+        required: true
+        inlined_as_list: true
+      pilot_ships:
+        description: The ship of each pilot.
+        range: PilotShip
+        multivalued: true
+        inlined_as_list: true
+      system_states:
+        description: >-
+          State of the systems visited so far. A system without state has not
+          been visited yet.
+        range: StarSystemState
+        multivalued: true
+        inlined_as_list: true
+
+  StarSystemState:
+    in_subset: [state]
+    description: >-
+      The state of one star system: what remains of its asteroids and
+      raiders, and the fuel pods floating there.
+    attributes:
+      star_system:
+        description: The star system this state belongs to.
+        range: StarSystem
+        required: true
+        inlined: false
+      asteroids:
+        description: Asteroids not broken yet.
+        range: Asteroid
+        multivalued: true
+        inlined_as_list: true
+      raider_ships:
+        description: Raider ships not destroyed yet.
+        range: RaiderShip
+        multivalued: true
+        inlined_as_list: true
+      fuel_pods:
+        description: Fuel pods not scooped up yet.
+        range: FuelPod
+        multivalued: true
+        inlined_as_list: true

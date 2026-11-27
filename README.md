@@ -6,8 +6,8 @@ Domain ontology for the Starflake space exploration game
 
 ## Ontology graph
 
-See the [ontology graph](docs/generated/ontology-graph.md) (rendered by GitHub), or
-run `just testdoc` for the browsable site. `just gen-graph` uses LinkML’s
+Open the [ontology graph](docs/generated/ontology-graph.mmd) in a Mermaid viewer.
+Regenerate it with `just gen-graph`, which uses LinkML’s
 [`gen-erdiagram`](https://linkml.io/linkml/generators/erdiagram.html) to draw
 entity relationships across all classes. `just test` checks that the graph is up to date.
 

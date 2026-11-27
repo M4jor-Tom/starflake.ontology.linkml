@@ -2,5 +2,5 @@
 
 Domain ontology for the Starflake space exploration game
 
-- [Ontology graph](generated/ontology-graph.md): the whole model on one diagram
+- [Ontology graph (Mermaid source)](generated/ontology-graph.mmd)
 - Auto-generated [schema documentation](generated/elements/index.md)

@@ -9,7 +9,7 @@
 LINKML_SCHEMA_NAME="starflake_ontology"
 LINKML_SCHEMA_AUTHOR="theta <tom-vautray@hotmail.fr>"
 LINKML_SCHEMA_DESCRIPTION="Domain ontology for the Starflake space exploration game"
-LINKML_SCHEMA_SOURCE_DIR="src/starflake_ontology/schema"
+LINKML_SCHEMA_SOURCE_DIR="src"
 
 ###### linkml generator variables, used by justfile
 

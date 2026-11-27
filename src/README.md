@@ -1,4 +1,4 @@
-# The linkML model and its Python representations
+# Ontology source
 
-This directory holds the schema, its Python representations
-and optionally also additional Python code for the project.
+[`starflake_ontology.yaml`](starflake_ontology.yaml) is the authored LinkML schema.
+Edit it here, then run `just gen-graph lint test` from the `ontology` dev shell.

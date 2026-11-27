@@ -28,8 +28,9 @@ dev = [
     "mknotebooks>= 0.8.0",
 ]
 
-# See https://hatch.pypa.io/latest/config/build/#file-selection for how to
-# explicitly include files other than default into the build distributions.
+[tool.hatch.build.targets.wheel]
+only-include = ["src/starflake_ontology.yaml"]
+sources = ["src"]
 
 [tool.hatch.version]
 source = "uv-dynamic-versioning"
@@ -46,9 +47,6 @@ testpaths = ["tests"]
 
 # https://docs.astral.sh/ruff/configuration/
 [tool.ruff]
-exclude = [
-    "src/starflake_ontology/_version.py",
-]
 # Set oldest supported Python version
 target-version = "py310"
 

@@ -6,7 +6,7 @@ import pytest
 from linkml.validator import validate_file
 
 DATA = Path(__file__).parent / "data"
-SCHEMA = DATA.parents[1] / "src/starflake_ontology/schema/starflake_ontology.yaml"
+SCHEMA = DATA.parents[1] / "src/starflake_ontology.yaml"
 
 
 @pytest.mark.parametrize("path", sorted(DATA.glob("*/*.yaml")), ids=lambda path: path.name)

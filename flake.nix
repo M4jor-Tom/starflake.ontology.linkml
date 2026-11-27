@@ -23,6 +23,9 @@
                   pkgs.uv
                   pkgs.python314
                   pkgs.just
+                  (pkgs.writeShellScriptBin "gen-erdiagram" ''
+                    exec ${pkgs.uv}/bin/uv run --locked -m linkml.generators.erdiagramgen "$@"
+                  '')
                 ];
                 # PyOxigraph's PyPI wheel needs the C++ runtime at import time.
                 shellHook = ''

@@ -7,8 +7,9 @@ Domain ontology for the Starflake space exploration game
 ## Ontology graph
 
 See the [ontology graph](docs/generated/ontology-graph.md) (rendered by GitHub), or
-run `just testdoc` for the browsable site. Regenerate it with `just gen-graph`;
-a test fails when it is out of date.
+run `just testdoc` for the browsable site. `just gen-graph` uses LinkML’s
+[`gen-erdiagram`](https://linkml.io/linkml/generators/erdiagram.html) to draw
+entity relationships across all classes. `just test` checks that the graph is up to date.
 
 ## Where does a Gherkin scenario belong?
 
@@ -45,10 +46,7 @@ Run every command inside `nix develop`, for example `nix develop --command just 
   * [generated/elements/](docs/generated/elements/) - generated schema documentation
 * [examples/](examples/) - Examples of using the schema
 * [project/](project/) - project files (these files are auto-generated, do not edit)
-* [src/](src/) - source files (edit these)
-  * [starflake_ontology](src/starflake_ontology)
-    * [schema/](src/starflake_ontology/schema) -- LinkML schema
-      (edit this)
+* [src/starflake_ontology.yaml](src/starflake_ontology.yaml) - authored LinkML schema
 * [tests/](tests/) - Python tests
   * [data/](tests/data) - Example data
 
